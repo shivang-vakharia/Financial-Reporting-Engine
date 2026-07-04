@@ -1,22 +1,4 @@
 {
-
-  
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "apps/web/dist",
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "VITE_API_URL/api/:path*"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/",
-      "permanent": false
-    }
-  ],
   "headers": [
     {
       "source": "/api/:path*",
