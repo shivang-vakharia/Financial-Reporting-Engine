@@ -118,6 +118,19 @@ export function createPostgresRepository(pool) {
       const result = await pool.query('SELECT * FROM ledger_mapping_results WHERE period_id = $1 ORDER BY created_at', [periodId]);
       return result.rows.map(mappingFromRow);
     },
+    async listMappingsByPeriodIds(periodIds) {
+      if (!periodIds || !periodIds.length) return [];
+      const result = await pool.query('SELECT * FROM ledger_mapping_results WHERE period_id = ANY($1) ORDER BY created_at', [periodIds]);
+      return result.rows.map(mappingFromRow);
+    },
+    async listPeriodsByIds(companyId, periodIds) {
+      if (!periodIds || !periodIds.length) return [];
+      const result = await pool.query(
+        `SELECT * FROM reporting_periods WHERE company_id = $1 AND id = ANY($2)`,
+        [companyId, periodIds]
+      );
+      return result.rows.map(periodFromRow);
+    },
     async createReportRun(reportRun) {
       const result = await pool.query(
         `INSERT INTO report_runs (id, company_id, period_id, report_type, metadata, status, created_at)

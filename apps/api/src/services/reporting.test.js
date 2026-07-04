@@ -61,3 +61,67 @@ test('parses, maps, and exports a trial balance workbook with unmapped ledgers',
   assert.equal(report.getWorksheet('Result').getCell('B9').value, 'Date of start of reporting period ');
   assert.equal(report.getWorksheet('Result').getCell('B12').value, 'Nature of report standalone or consolidated');
 });
+
+test('generates result workbook with comparative period values in the correct columns', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fre-'));
+  const currentPath = path.join(dir, 'current.xlsx');
+  const priorPath = path.join(dir, 'prior.xlsx');
+  const outputPath = path.join(dir, 'comparative-report.xlsx');
+
+  const currentWorkbook = new ExcelJS.Workbook();
+  const currentSheet = currentWorkbook.addWorksheet('Trial Balance');
+  currentSheet.addRow(['Particulars', 'Closing Balance']);
+  currentSheet.addRow(['', 'Debit', 'Credit']);
+  currentSheet.addRow(['Flat Sales', '', 250000]);
+  currentSheet.addRow(['Salary Expense', 50000, '']);
+  currentSheet.addRow(['Equity Share Capital', '', 100000]);
+  await currentWorkbook.xlsx.writeFile(currentPath);
+
+  const priorWorkbook = new ExcelJS.Workbook();
+  const priorSheet = priorWorkbook.addWorksheet('Trial Balance');
+  priorSheet.addRow(['Particulars', 'Closing Balance']);
+  priorSheet.addRow(['', 'Debit', 'Credit']);
+  priorSheet.addRow(['Flat Sales', '', 120000]);
+  priorSheet.addRow(['Salary Expense', 25000, '']);
+  priorSheet.addRow(['Equity Share Capital', '', 90000]);
+  await priorWorkbook.xlsx.writeFile(priorPath);
+
+  const currentParsed = await parseTrialBalance(currentPath);
+  const priorParsed = await parseTrialBalance(priorPath);
+
+  const currentLedgers = currentParsed.ledgers.map((ledger, index) => ({
+    ...ledger,
+    id: `current-${index}`,
+    uploadId: 'upload-current',
+    periodId: 'period-current'
+  }));
+  const priorLedgers = priorParsed.ledgers.map((ledger, index) => ({
+    ...ledger,
+    id: `prior-${index}`,
+    uploadId: 'upload-prior',
+    periodId: 'period-prior'
+  }));
+
+  const currentMappings = mapLedgers(currentLedgers);
+  const priorMappings = mapLedgers(priorLedgers);
+
+  await generateReportWorkbook({
+    company: { name: 'Test Limited', cin: 'U00000GJ2026PLC000000', registeredOffice: 'Surat', metadata: {} },
+    period: { id: 'period-current', label: 'FY 2025-26 Q1', periodType: 'quarterly', startDate: '2025-04-01', endDate: '2025-06-30' },
+    reportRun: { id: 'run-2', reportType: 'standalone', metadata: {} },
+    ledgers: currentLedgers,
+    mappings: currentMappings,
+    comparativePeriods: [{ id: 'period-prior', label: 'FY 2025-26 Q4', periodType: 'quarterly', startDate: '2025-01-01', endDate: '2025-03-31' }],
+    comparativeMappings: priorMappings,
+    outputPath
+  });
+
+  const report = new ExcelJS.Workbook();
+  await report.xlsx.readFile(outputPath);
+  const resultSheet = report.getWorksheet('Result');
+
+  assert.equal(resultSheet.getCell('C13').value, 250000);
+  assert.equal(resultSheet.getCell('D13').value, 120000);
+  assert.equal(resultSheet.getCell('F13').value, 250000);
+  assert.equal(resultSheet.getCell('G13').value, 120000);
+});

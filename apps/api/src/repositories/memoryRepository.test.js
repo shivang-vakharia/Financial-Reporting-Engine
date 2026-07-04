@@ -41,5 +41,27 @@ test('memory repository persists company workflow entities through the storage c
   });
   const context = await repository.getPeriodForOwner(period.id, user.id);
   assert.equal(context.company.id, company.id);
+
+  const periodByIds = await repository.listPeriodsByIds(company.id, [period.id]);
+  assert.equal(periodByIds.length, 1);
+
+  store.mappings.push({
+    id: 'mapping-1',
+    uploadId: 'upload-1',
+    periodId: period.id,
+    ledgerEntryId: 'ledger-1',
+    rawName: 'Fixed Assets',
+    netAmount: 10000,
+    status: 'mapped',
+    scheduleLineId: 'ppe',
+    scheduleLabel: 'Property, Plant and Equipment',
+    statement: 'balance_sheet',
+    section: 'Non-current Assets',
+    xbrlElement: 'in-gaap:PropertyPlantAndEquipment',
+    mappingSource: 'rule',
+    confidenceLabel: 'rule'
+  });
+  const mappingsByIds = await repository.listMappingsByPeriodIds([period.id]);
+  assert.equal(mappingsByIds.length, 1);
 });
 

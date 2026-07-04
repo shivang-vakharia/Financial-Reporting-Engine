@@ -141,6 +141,7 @@ function App() {
         <ReportGenerator
           company={selectedCompany}
           period={selectedPeriod}
+          periods={periods}
           reports={reports}
           onGenerated={async () => {
             setMessage('Report generated. It is available in download history.');
@@ -301,15 +302,23 @@ function MappingTable({ mapping }) {
   );
 }
 
-function ReportGenerator({ company, period, reports, onGenerated }) {
+function ReportGenerator({ company, period, periods, reports, onGenerated }) {
   const [metadata, setMetadata] = useState({ reportType: 'standalone' });
+  const [comparativePeriodIds, setComparativePeriodIds] = useState([]);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setComparativePeriodIds([]);
+  }, [period?.id]);
+
+  const comparativeOptions = periods.filter((item) => item.id !== period?.id);
+
   async function generate() {
     if (!period) return;
     setError('');
     await api(`/periods/${period.id}/report-runs`, {
       method: 'POST',
-      body: JSON.stringify({ reportType: metadata.reportType, metadata })
+      body: JSON.stringify({ reportType: metadata.reportType, metadata, comparativePeriodIds })
     });
     onGenerated();
   }
@@ -329,6 +338,22 @@ function ReportGenerator({ company, period, reports, onGenerated }) {
           <option value="standalone">Standalone</option>
           <option value="consolidated">Consolidated</option>
         </select>
+      </div>
+      <div className="report-options">
+        <label>Comparative periods</label>
+        <select
+          multiple
+          value={comparativePeriodIds}
+          onChange={(event) => setComparativePeriodIds(Array.from(event.target.selectedOptions).map((option) => option.value))}
+          size={Math.min(6, comparativeOptions.length || 1)}
+        >
+          {comparativeOptions.map((periodItem) => (
+            <option key={periodItem.id} value={periodItem.id}>{periodItem.label}</option>
+          ))}
+        </select>
+        <span className="muted">Select up to 3 prior periods to populate comparative columns.</span>
+      </div>
+      <div className="report-options">
         <span className="muted">Exports are allowed even when unmapped ledgers exist. They are listed in the workbook.</span>
       </div>
       {error && <p className="inline-error">{error}</p>}

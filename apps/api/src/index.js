@@ -213,16 +213,28 @@ app.post('/periods/:periodId/report-runs', requireAuth, async (req, res) => {
   if (!uploads.length || !ledgers.length) {
     return res.status(400).json({ error: 'Upload at least one trial balance before generating a report.' });
   }
+  const comparativePeriodIds = Array.isArray(req.body.comparativePeriodIds)
+    ? req.body.comparativePeriodIds.filter((id) => typeof id === 'string')
+    : [];
+  const metadata = { ...(req.body.metadata || {}), comparativePeriodIds };
+
   const reportRun = {
     id: uuid(),
     companyId: company.id,
     periodId: period.id,
     reportType: req.body.reportType || 'standalone',
-    metadata: req.body.metadata || {},
+    metadata,
     status: 'processing',
     createdAt: new Date().toISOString()
   };
   await repository.createReportRun(reportRun);
+
+  const comparativePeriods = comparativePeriodIds.length
+    ? (await repository.listPeriodsByIds(company.id, comparativePeriodIds)).filter((item) => item.id !== period.id)
+    : await repository.listComparativePeriods(company.id, period.id);
+  const comparativeMappings = comparativePeriods.length
+    ? await repository.listMappingsByPeriodIds(comparativePeriods.map((item) => item.id))
+    : [];
 
   const fileName = `${safeName(company.name)}-${safeName(period.label)}-${reportRun.reportType}-${Date.now()}.xlsx`;
   const outputPath = path.join(generatedDir, fileName);
@@ -233,7 +245,8 @@ app.post('/periods/:periodId/report-runs', requireAuth, async (req, res) => {
     ledgers,
     mappings,
     outputPath,
-    comparativePeriods: await repository.listComparativePeriods(company.id, period.id)
+    comparativePeriods,
+    comparativeMappings
   });
   const completed = await repository.completeReportRun(reportRun.id, {
     status: 'completed',
