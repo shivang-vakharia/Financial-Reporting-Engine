@@ -45,7 +45,7 @@ export const mappingRules = [
   rule('material consumed|raw material|cement purchase|sand purchase|brick purchase|hardware purchase|stores consumed|direct materials|raw materials consumed', 'materials_consumed'),
   rule('purchase account|stock in trade|purchase @|purchases|purchase of goods|goods purchased|trading purchase', 'stock_trade_purchase'),
   rule('salary|wages|employee|bonus|gratuity|pf|esi|provident fund|payroll|staff welfare|employee benefits', 'employee_benefits'),
-  rule('interest on|bank charges|finance cost|commission|loan interest|interest expense|bank charges expense', 'finance_costs'),
+  rule('interest on|bank charges|finance cost|finance costs|finance charge|finance charges|commission|loan interest|interest expense|bank charges expense', 'finance_costs'),
   rule('depreciation|amortisation|amortization|depletion', 'depreciation'),
   rule('tax expense|current tax|deferred tax|income tax|tax liability|tax provision|tds|gst tax|tax expense', 'tax_expense'),
   rule('expense|fees|electricity|freight|miscellaneous|rera|software|stationery|construction|labour|gst expense|smc|legal expense|rent expense|printing|advertisement|repair|maintenance', 'other_expenses')

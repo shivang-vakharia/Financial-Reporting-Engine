@@ -13,18 +13,22 @@ function App() {
   const [mapping, setMapping] = useState({ mappings: [], summary: { total: 0, mapped: 0, unmapped: 0 } });
   const [uploads, setUploads] = useState([]);
   const [reports, setReports] = useState([]);
+  const [scheduleLines, setScheduleLines] = useState([]);
   const [message, setMessage] = useState('');
+  const [currentView, setCurrentView] = useState('home');
 
   useEffect(() => {
     if (!session?.token) return;
     setToken(session.token);
     refreshCompanies();
-    refreshReports();
+    refreshScheduleLines();
+    refreshReports(companyId);
   }, [session?.token]);
 
   useEffect(() => {
     if (!companyId) return;
     refreshPeriods(companyId);
+    refreshReports(companyId);
   }, [companyId]);
 
   useEffect(() => {
@@ -40,6 +44,12 @@ function App() {
     const data = await api('/companies');
     setCompanies(data);
     if (data[0] && !companyId) setCompanyId(data[0].id);
+    return data;
+  }
+
+  async function refreshScheduleLines() {
+    const data = await api('/schedule-lines');
+    setScheduleLines(data);
   }
 
   async function refreshPeriods(id) {
@@ -58,8 +68,34 @@ function App() {
     setUploads(data);
   }
 
-  async function refreshReports() {
+  async function refreshReports(selectedCompanyId) {
+    if (selectedCompanyId) {
+      setReports(await api(`/companies/${selectedCompanyId}/report-runs`));
+      return;
+    }
     setReports(await api('/report-runs'));
+  }
+
+  async function deleteCompany(id) {
+    if (!id || !confirm('Delete this company and all associated periods, uploads, and reports?')) return;
+    await api(`/companies/${id}`, { method: 'DELETE' });
+    const companies = await refreshCompanies();
+    const nextCompanyId = companies[0]?.id || '';
+    setCompanyId(nextCompanyId);
+    if (!nextCompanyId) {
+      setPeriodId('');
+      setPeriods([]);
+    }
+    await refreshReports(nextCompanyId);
+  }
+
+  async function updateMappingResult(mappingId, scheduleLineId) {
+    if (!periodId || !mappingId || !scheduleLineId) return;
+    await api(`/periods/${periodId}/mapping-results/${mappingId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ scheduleLineId })
+    });
+    await refreshMapping(periodId);
   }
 
   async function handleSession(payload) {
@@ -86,9 +122,10 @@ function App() {
           </div>
         </div>
         <nav>
-          <a className="active"><LayoutDashboard size={18} /> Workspace</a>
-          <a><FileSpreadsheet size={18} /> Reports</a>
-          <a><Settings size={18} /> Settings</a>
+          <button type="button" className={currentView === 'home' ? 'active' : ''} onClick={() => setCurrentView('home')}><LayoutDashboard size={18} /> Home</button>
+          <button type="button" className={currentView === 'workspace' ? 'active' : ''} onClick={() => setCurrentView('workspace')}><FileSpreadsheet size={18} /> Workspace</button>
+          <button type="button" className={currentView === 'reports' ? 'active' : ''} onClick={() => setCurrentView('reports')}><FileSpreadsheet size={18} /> Reports</button>
+          <button type="button" className={currentView === 'settings' ? 'active' : ''} onClick={() => setCurrentView('settings')}><Settings size={18} /> Settings</button>
         </nav>
       </aside>
       <main className="workspace">
@@ -109,45 +146,89 @@ function App() {
 
         <section className="page-header">
           <div>
-            <p>Workspace / Ind AS Schedule III / Financial Results</p>
-            <h1>Financial Reporting Workspace</h1>
+            <p>{currentView === 'home' ? 'Welcome to your financial reporting workspace' : currentView === 'workspace' ? 'Workspace / Ind AS Schedule III / Financial Results' : currentView === 'reports' ? 'Reports / Download history' : 'Settings and preferences'}</p>
+            <h1>{currentView === 'home' ? 'Welcome back' : currentView === 'workspace' ? 'Financial Reporting Workspace' : currentView === 'reports' ? 'Report Library' : 'Settings'}</h1>
           </div>
-          <div className="actions">
-            <CreateCompany onCreated={async (company) => { await refreshCompanies(); setCompanyId(company.id); }} />
-            {selectedCompany && <CreatePeriod company={selectedCompany} onCreated={async (period) => { await refreshPeriods(companyId); setPeriodId(period.id); }} />}
-          </div>
+          {currentView === 'workspace' && (
+            <div className="actions">
+              <CreateCompany onCreated={async (company) => { await refreshCompanies(); setCompanyId(company.id); }} />
+              {selectedCompany && <CreatePeriod company={selectedCompany} onCreated={async (period) => { await refreshPeriods(companyId); setPeriodId(period.id); }} />}
+            </div>
+          )}
         </section>
 
-        <section className="stats-grid">
-          <Stat label="Companies" value={companies.length} />
-          <Stat label="Uploaded TBs" value={uploads.length} />
-          <Stat label="Mapped Ledgers" value={mapping.summary.mapped} />
-          <Stat label="Unmapped" value={mapping.summary.unmapped} tone={mapping.summary.unmapped ? 'danger' : ''} />
-        </section>
+        {currentView === 'home' && (
+          <div>
+            <section className="stats-grid">
+              <Stat label="Companies" value={companies.length} />
+              <Stat label="Uploaded TBs" value={uploads.length} />
+              <Stat label="Mapped Ledgers" value={mapping.summary.mapped} />
+              <Stat label="Unmapped" value={mapping.summary.unmapped} tone={mapping.summary.unmapped ? 'danger' : ''} />
+            </section>
+            <section className="grid-two">
+              <Panel title="Quick Start">
+                <p>Use the workspace to upload trial balances, map ledgers, and generate statutory reports.</p>
+                <div className="actions">
+                  <CreateCompany onCreated={async (company) => { await refreshCompanies(); setCompanyId(company.id); }} />
+                  {selectedCompany && <CreatePeriod company={selectedCompany} onCreated={async (period) => { await refreshPeriods(companyId); setPeriodId(period.id); }} />}
+                </div>
+              </Panel>
+              <Panel title="Selected Company">
+                {selectedCompany ? (
+                  <>
+                    <p><strong>{selectedCompany.name}</strong></p>
+                    <p>{selectedCompany.cin}</p>
+                    <p>{selectedCompany.registeredOffice}</p>
+                    <button className="secondary" type="button" onClick={() => setCurrentView('workspace')}>Go to workspace</button>
+                  </>
+                ) : (
+                  <p className="muted">Create or choose a company to begin reviewing trial balances and generating reports.</p>
+                )}
+              </Panel>
+            </section>
+          </div>
+        )}
 
-        <section className="grid-two">
-          <CompanyMetadata company={selectedCompany} onSaved={refreshCompanies} />
-          <UploadTrialBalance period={selectedPeriod} onUploaded={async (result) => {
-            setMessage(`Parsed ${result.validation.rowCount} rows. Unmapped ledgers: ${result.mappingSummary.unmapped}.`);
-            await refreshMapping(periodId);
-            await refreshUploads(periodId);
+        {currentView === 'workspace' && (
+          <>
+            <section className="stats-grid">
+              <Stat label="Companies" value={companies.length} />
+              <Stat label="Uploaded TBs" value={uploads.length} />
+              <Stat label="Mapped Ledgers" value={mapping.summary.mapped} />
+              <Stat label="Unmapped" value={mapping.summary.unmapped} tone={mapping.summary.unmapped ? 'danger' : ''} />
+            </section>
+            <section className="grid-two">
+              <CompanyMetadata company={selectedCompany} onSaved={refreshCompanies} onDeleted={deleteCompany} />
+              <UploadTrialBalance period={selectedPeriod} onUploaded={async (result) => {
+                setMessage(`Parsed ${result.validation.rowCount} rows. Unmapped ledgers: ${result.mappingSummary.unmapped}.`);
+                await refreshMapping(periodId);
+                await refreshUploads(periodId);
+              }} />
+            </section>
+            {message && <div className="notice">{message}</div>}
+            <MappingTable mapping={mapping} scheduleLines={scheduleLines} onMappingUpdated={updateMappingResult} />
+            <ReportGenerator
+              company={selectedCompany}
+              period={selectedPeriod}
+              periods={periods}
+              reports={reports}
+              onGenerated={async () => {
+                setMessage('Report generated. It is available in download history.');
+                await refreshReports(companyId);
+              }}
+            />
+          </>
+        )}
+
+        {currentView === 'reports' && (
+          <ReportsView company={selectedCompany} reports={reports} onDownload={async (report) => {
+            await downloadFile(`/report-runs/${report.id}/download`, report.fileName);
           }} />
-        </section>
+        )}
 
-        {message && <div className="notice">{message}</div>}
-
-        <MappingTable mapping={mapping} />
-
-        <ReportGenerator
-          company={selectedCompany}
-          period={selectedPeriod}
-          periods={periods}
-          reports={reports}
-          onGenerated={async () => {
-            setMessage('Report generated. It is available in download history.');
-            await refreshReports();
-          }}
-        />
+        {currentView === 'settings' && (
+          <SettingsView session={session} />
+        )}
       </main>
     </div>
   );
@@ -231,7 +312,7 @@ function CreatePeriod({ company, onCreated }) {
   ) : <button className="secondary" onClick={() => setOpen(true)}><Plus size={16} /> Add Period</button>;
 }
 
-function CompanyMetadata({ company, onSaved }) {
+function CompanyMetadata({ company, onSaved, onDeleted }) {
   const [form, setForm] = useState({});
   useEffect(() => {
     if (company) setForm({ ...company.metadata, name: company.name, cin: company.cin, registeredOffice: company.registeredOffice });
@@ -243,7 +324,9 @@ function CompanyMetadata({ company, onSaved }) {
     onSaved();
   }
   return (
-    <Panel title="Report Metadata">
+    <Panel title="Report Metadata" actions={
+      <button type="button" className="danger" onClick={() => onDeleted?.(company.id)}>Delete company</button>
+    }>
       <form className="metadata-grid" onSubmit={save}>
         {['name', 'cin', 'registeredOffice', 'auditStatus', 'boardMeetingDate', 'paidUpCapital', 'faceValue', 'directorName', 'din', 'place'].map((key) => (
           <Field key={key} label={labelize(key)} value={form[key] || ''} onChange={(value) => setForm({ ...form, [key]: value })} />
@@ -277,27 +360,53 @@ function UploadTrialBalance({ period, onUploaded }) {
   );
 }
 
-function MappingTable({ mapping }) {
+function MappingTable({ mapping, scheduleLines, onMappingUpdated }) {
+  const [collapsed, setCollapsed] = useState(false);
   const rows = useMemo(() => mapping.mappings.slice(0, 100), [mapping.mappings]);
   return (
-    <Panel title="Ledger Mapping Review" actions={<span className="badge danger">{mapping.summary.unmapped} unmapped</span>}>
-      <div className="table-wrap">
-        <table>
-          <thead><tr><th>Ledger</th><th>Amount</th><th>Schedule III Line</th><th>XBRL Element</th><th>Status</th></tr></thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className={row.status === 'unmapped' ? 'row-danger' : ''}>
-                <td>{row.rawName}</td>
-                <td className="num">{formatMoney(row.netAmount)}</td>
-                <td>{row.scheduleLabel}</td>
-                <td>{row.xbrlElement || '-'}</td>
-                <td><span className={`badge ${row.status === 'unmapped' ? 'danger' : 'ok'}`}>{row.status}</span></td>
-              </tr>
-            ))}
-            {!rows.length && <tr><td colSpan="5" className="empty">Upload a trial balance to view mappings.</td></tr>}
-          </tbody>
-        </table>
-      </div>
+    <Panel
+      title="Ledger Mapping Review"
+      actions={
+        <div className="panel-actions-inline">
+          <span className="badge danger">{mapping.summary.unmapped} unmapped</span>
+          <button className="ghost" type="button" onClick={() => setCollapsed((prev) => !prev)}>
+            {collapsed ? 'Expand' : 'Collapse'}
+          </button>
+        </div>
+      }
+    >
+      {!collapsed ? (
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Ledger</th><th>Amount</th><th>Schedule III Line</th><th>XBRL Element</th><th>Status</th></tr></thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className={row.status === 'unmapped' ? 'row-danger' : ''}>
+                  <td>{row.rawName}</td>
+                  <td className="num">{formatMoney(row.netAmount)}</td>
+                  <td>
+                    {row.status === 'unmapped' ? (
+                      <select value={row.scheduleLineId || ''} onChange={(event) => onMappingUpdated(row.id, event.target.value)}>
+                        <option value="">Choose schedule line</option>
+                        {scheduleLines.map((line) => (
+                          <option key={line.id} value={line.id}>{line.label}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      row.scheduleLabel
+                    )}
+                  </td>
+                  <td>{row.xbrlElement || '-'}</td>
+                  <td><span className={`badge ${row.status === 'unmapped' ? 'danger' : 'ok'}`}>{row.status}</span></td>
+                </tr>
+              ))}
+              {!rows.length && <tr><td colSpan="5" className="empty">Upload a trial balance to view mappings.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="muted">Ledger mapping review is collapsed. Expand to inspect mappings and assign unmapped entries.</p>
+      )}
     </Panel>
   );
 }
@@ -372,6 +481,52 @@ function ReportGenerator({ company, period, periods, reports, onGenerated }) {
             {!reports.length && <tr><td colSpan="4" className="empty">No generated reports yet.</td></tr>}
           </tbody>
         </table>
+      </div>
+    </Panel>
+  );
+}
+
+function ReportsView({ company, reports, onDownload }) {
+  return (
+    <Panel title="Report History">
+      {company ? (
+        <>
+          <p className="muted">Showing reports for <strong>{company.name}</strong>. Use the workspace to upload trial balances and generate new report runs.</p>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Report</th><th>Status</th><th>Generated</th><th>Action</th></tr></thead>
+              <tbody>
+                {reports.map((report) => (
+                  <tr key={report.id}>
+                    <td>{report.fileName || `${report.reportType} report`}</td>
+                    <td><span className="badge ok">{report.status}</span></td>
+                    <td>{new Date(report.createdAt).toLocaleString()}</td>
+                    <td><button className="download" onClick={() => onDownload(report)}><Download size={16} /> Download</button></td>
+                  </tr>
+                ))}
+                {!reports.length && <tr><td colSpan="4" className="empty">No reports generated for this company yet.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p className="muted">Select a company above to filter reports by company.</p>
+      )}
+    </Panel>
+  );
+}
+
+function SettingsView({ session }) {
+  return (
+    <Panel title="Application Settings">
+      <p className="muted">Manage your account settings and workspace preferences in future releases.</p>
+      <div className="settings-block">
+        <div><strong>Signed in as</strong></div>
+        <div>{session?.user?.name} ({session?.user?.email})</div>
+      </div>
+      <div className="settings-block">
+        <div><strong>Provider</strong></div>
+        <div>{session ? 'Local development' : 'Unknown'}</div>
       </div>
     </Panel>
   );

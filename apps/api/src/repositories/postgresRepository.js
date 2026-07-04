@@ -118,10 +118,76 @@ export function createPostgresRepository(pool) {
       const result = await pool.query('SELECT * FROM ledger_mapping_results WHERE period_id = $1 ORDER BY created_at', [periodId]);
       return result.rows.map(mappingFromRow);
     },
+    async getMappingById(mappingId) {
+      const result = await pool.query('SELECT * FROM ledger_mapping_results WHERE id = $1', [mappingId]);
+      return result.rows[0] ? mappingFromRow(result.rows[0]) : null;
+    },
+    async updateMapping(mappingId, patch) {
+      const current = await this.getMappingById(mappingId);
+      if (!current) return null;
+      const result = await pool.query(
+        `UPDATE ledger_mapping_results
+         SET status = $1,
+             schedule_line_id = $2,
+             schedule_label = $3,
+             statement = $4,
+             section = $5,
+             xbrl_element = $6,
+             mapping_source = $7,
+             confidence_label = $8
+         WHERE id = $9
+         RETURNING *`,
+        [
+          patch.status ?? current.status,
+          patch.scheduleLineId ?? current.scheduleLineId,
+          patch.scheduleLabel ?? current.scheduleLabel,
+          patch.statement ?? current.statement,
+          patch.section ?? current.section,
+          patch.xbrlElement ?? current.xbrlElement,
+          patch.mappingSource ?? current.mappingSource,
+          patch.confidenceLabel ?? current.confidenceLabel,
+          mappingId
+        ]
+      );
+      return result.rows[0] ? mappingFromRow(result.rows[0]) : null;
+    },
     async listMappingsByPeriodIds(periodIds) {
       if (!periodIds || !periodIds.length) return [];
       const result = await pool.query('SELECT * FROM ledger_mapping_results WHERE period_id = ANY($1) ORDER BY created_at', [periodIds]);
       return result.rows.map(mappingFromRow);
+    },
+    async listReportRunsForCompany(companyId) {
+      const result = await pool.query('SELECT * FROM report_runs WHERE company_id = $1 ORDER BY created_at DESC', [companyId]);
+      return result.rows.map(reportRunFromRow);
+    },
+    async deleteCompany(companyId, ownerId) {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        const companyResult = await client.query('SELECT * FROM companies WHERE id = $1 AND owner_id = $2', [companyId, ownerId]);
+        if (!companyResult.rows[0]) {
+          await client.query('ROLLBACK');
+          return null;
+        }
+        const company = companyFromRow(companyResult.rows[0]);
+        const periodIdsResult = await client.query('SELECT id FROM reporting_periods WHERE company_id = $1', [companyId]);
+        const periodIds = periodIdsResult.rows.map((row) => row.id);
+        if (periodIds.length) {
+          await client.query('DELETE FROM ledger_mapping_results WHERE period_id = ANY($1)', [periodIds]);
+          await client.query('DELETE FROM ledger_entries WHERE period_id = ANY($1)', [periodIds]);
+          await client.query('DELETE FROM trial_balance_uploads WHERE period_id = ANY($1)', [periodIds]);
+          await client.query('DELETE FROM reporting_periods WHERE id = ANY($1)', [periodIds]);
+        }
+        await client.query('DELETE FROM report_runs WHERE company_id = $1', [companyId]);
+        await client.query('DELETE FROM companies WHERE id = $1 AND owner_id = $2', [companyId, ownerId]);
+        await client.query('COMMIT');
+        return company;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     },
     async listPeriodsByIds(companyId, periodIds) {
       if (!periodIds || !periodIds.length) return [];
