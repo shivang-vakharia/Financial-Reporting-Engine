@@ -2,8 +2,10 @@ import { mappingRules } from './mappingRules.js';
 
 export function mapLedgers(ledgers) {
   return ledgers.map((ledger) => {
-    const haystack = `${ledger.normalizedName} ${ledger.parentGroup || ''}`;
-    const matched = mappingRules.find((rule) => rule.pattern.test(haystack));
+    const ledgerName = ledger.normalizedName || normalizeName(ledger.rawName);
+    const parentGroup = normalizeName(ledger.parentGroup || '');
+    const matched = mappingRules.find((rule) => rule.pattern.test(ledgerName)) ||
+      mappingRules.find((rule) => rule.pattern.test(parentGroup));
     if (!matched) {
       return {
         id: `${ledger.id}:unmapped`,
@@ -44,3 +46,6 @@ export function mapLedgers(ledgers) {
   });
 }
 
+function normalizeName(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
