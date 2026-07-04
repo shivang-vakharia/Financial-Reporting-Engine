@@ -149,3 +149,4 @@ TrialBal.xlsx
 # Financial Reporting Engine runtime output
 uploads/
 generated/
+apps/api/storage/

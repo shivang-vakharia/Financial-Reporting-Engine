@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fre-api
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - WEB_ORIGIN=${WEB_ORIGIN:-http://localhost:5173}
+      - DATABASE_URL=${DATABASE_URL:-}
+      - STORAGE_DRIVER=${STORAGE_DRIVER:-memory}
+    volumes:
+      # Mount storage for persistence across container restarts
+      - fre-storage:/app/apps/api/storage
+      - fre-uploads:/app/apps/api/uploads
+      - fre-generated:/app/apps/api/generated
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: PostgreSQL database (uncomment if using PostgreSQL)
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: fre-postgres
+  #   environment:
+  #     - POSTGRES_DB=financial_reporting_engine
+  #     - POSTGRES_USER=fre_user
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD:-change-me-in-production}
+  #   volumes:
+  #     - fre-postgres-data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U fre_user"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  fre-storage:
+    driver: local
+  fre-uploads:
+    driver: local
+  fre-generated:
+    driver: local
+  # fre-postgres-data:
+  #   driver: local
+
+# networks:
+#   default:
+#     name: fre-network

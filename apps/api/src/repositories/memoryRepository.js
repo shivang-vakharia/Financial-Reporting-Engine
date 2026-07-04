@@ -1,4 +1,4 @@
-import { store } from '../store/memoryStore.js';
+import { persistStore, store } from '../store/memoryStore.js';
 
 export function createMemoryRepository() {
   return {
@@ -7,6 +7,7 @@ export function createMemoryRepository() {
     },
     async createUser(user) {
       store.users.push(user);
+      persistStore();
       return user;
     },
     async listCompanies(ownerId) {
@@ -14,6 +15,7 @@ export function createMemoryRepository() {
     },
     async createCompany(company) {
       store.companies.push(company);
+      persistStore();
       return company;
     },
     async getCompanyForOwner(companyId, ownerId) {
@@ -24,6 +26,7 @@ export function createMemoryRepository() {
       if (!company) return null;
       Object.assign(company, patch);
       if (patch.metadata) company.metadata = { ...(company.metadata || {}), ...patch.metadata };
+      persistStore();
       return company;
     },
     async listPeriods(companyId) {
@@ -31,6 +34,7 @@ export function createMemoryRepository() {
     },
     async createPeriod(period) {
       store.periods.push(period);
+      persistStore();
       return period;
     },
     async getPeriodForOwner(periodId, ownerId) {
@@ -41,10 +45,12 @@ export function createMemoryRepository() {
     },
     async createUpload(upload) {
       store.uploads.push(upload);
+      persistStore();
       return upload;
     },
     async createLedgers(ledgers) {
       store.ledgers.push(...ledgers);
+      persistStore();
       return ledgers;
     },
     async listUploads(periodId) {
@@ -58,10 +64,12 @@ export function createMemoryRepository() {
     },
     async replaceMappingsForUpload(uploadId, mappings) {
       store.mappings = store.mappings.filter((mapping) => mapping.uploadId !== uploadId).concat(mappings);
+      persistStore();
       return mappings;
     },
     async replaceMappingsForPeriod(periodId, mappings) {
       store.mappings = store.mappings.filter((mapping) => mapping.periodId !== periodId).concat(mappings);
+      persistStore();
       return mappings;
     },
     async listMappingsByPeriod(periodId) {
@@ -78,6 +86,7 @@ export function createMemoryRepository() {
       const mapping = await this.getMappingById(mappingId);
       if (!mapping) return null;
       Object.assign(mapping, patch);
+      persistStore();
       return mapping;
     },
     async listReportRunsForCompany(companyId) {
@@ -93,6 +102,7 @@ export function createMemoryRepository() {
       store.uploads = store.uploads.filter((upload) => !periodIds.includes(upload.periodId));
       store.periods = store.periods.filter((period) => period.companyId !== companyId);
       store.companies = store.companies.filter((candidate) => candidate.id !== companyId);
+      persistStore();
       return company;
     },
     async listPeriodsByIds(companyId, periodIds) {
@@ -101,12 +111,14 @@ export function createMemoryRepository() {
     },
     async createReportRun(reportRun) {
       store.reportRuns.push(reportRun);
+      persistStore();
       return reportRun;
     },
     async completeReportRun(reportRunId, patch) {
       const reportRun = store.reportRuns.find((run) => run.id === reportRunId);
       if (!reportRun) return null;
       Object.assign(reportRun, patch);
+      persistStore();
       return reportRun;
     },
     async listReportRunsForOwner(ownerId) {

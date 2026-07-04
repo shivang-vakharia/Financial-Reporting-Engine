@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
     "build": "npm run build -w apps/web",
+    "build:web": "npm run build -w apps/web",
     "start": "npm run start -w apps/api",
-    "test": "npm run test -w apps/api"
+    "start:prod": "concurrently \"npm run start -w apps/api\" \"npm run preview -w apps/web\"",
+    "test": "npm run test -w apps/api",
+    "validate-env": "node scripts/validate-env.js"
   },
   "workspaces": [
     "apps/api",

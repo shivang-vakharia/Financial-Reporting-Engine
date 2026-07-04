@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import path from 'node:path';
 import fs from 'node:fs';
 import bcrypt from 'bcryptjs';
@@ -24,6 +26,43 @@ fs.mkdirSync(generatedDir, { recursive: true });
 
 const app = express();
 const repository = createRepository();
+
+// Security middleware
+app.use(helmet());
+
+// Rate limiting - strict for auth endpoints, moderate for API
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.WEB_ORIGIN || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400
+};
+
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '2mb' }));
+
+// Apply rate limiting to API routes
+app.use('/api/', apiLimiter);
+app.use('/auth/', authLimiter);
+
 const upload = multer({
   dest: uploadDir,
   limits: { fileSize: 50 * 1024 * 1024 },
@@ -35,9 +74,6 @@ const upload = multer({
     cb(null, true);
   }
 });
-
-app.use(cors({ origin: process.env.WEB_ORIGIN || 'http://localhost:5173' }));
-app.use(express.json({ limit: '2mb' }));
 
 const jwtSecret = process.env.JWT_SECRET || 'dev-secret-change-me';
 
@@ -350,6 +386,35 @@ function pick(source, keys) {
     return acc;
   }, {});
 }
+
+// Global error handler middleware
+app.use((err, req, res, next) => {
+  const isDev = process.env.NODE_ENV !== 'production';
+  
+  if (err.status === 429) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
+  
+  if (err.message && err.message.includes('Only Excel files are supported')) {
+    return res.status(400).json({ error: 'Only Excel files (.xlsx, .xlsm, .xls) are supported.' });
+  }
+  
+  if (err.message && err.message.includes('File too large')) {
+    return res.status(413).json({ error: 'File size exceeds 50MB limit.' });
+  }
+  
+  console.error('Error:', isDev ? err : err.message);
+  
+  res.status(err.status || 500).json({
+    error: isDev ? err.message : 'Internal server error',
+    ...(isDev && { stack: err.stack })
+  });
+});
+
+// 404 handler
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
 
 const port = Number(process.env.PORT || 4000);
 app.listen(port, () => {

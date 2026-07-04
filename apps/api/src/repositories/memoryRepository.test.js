@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMemoryRepository } from './memoryRepository.js';
@@ -63,5 +66,10 @@ test('memory repository persists company workflow entities through the storage c
   });
   const mappingsByIds = await repository.listMappingsByPeriodIds([period.id]);
   assert.equal(mappingsByIds.length, 1);
+
+  const storagePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../storage/memory-store.json');
+  const persisted = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+  assert.equal(persisted.companies[0].id, company.id);
+  assert.equal(persisted.periods[0].id, period.id);
 });
 
