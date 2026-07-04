@@ -71,6 +71,30 @@ export function createMemoryRepository() {
       if (!periodIds || !periodIds.length) return [];
       return store.mappings.filter((mapping) => periodIds.includes(mapping.periodId));
     },
+    async getMappingById(mappingId) {
+      return store.mappings.find((mapping) => mapping.id === mappingId) || null;
+    },
+    async updateMapping(mappingId, patch) {
+      const mapping = await this.getMappingById(mappingId);
+      if (!mapping) return null;
+      Object.assign(mapping, patch);
+      return mapping;
+    },
+    async listReportRunsForCompany(companyId) {
+      return store.reportRuns.filter((run) => run.companyId === companyId);
+    },
+    async deleteCompany(companyId, ownerId) {
+      const company = await this.getCompanyForOwner(companyId, ownerId);
+      if (!company) return null;
+      const periodIds = store.periods.filter((period) => period.companyId === companyId).map((period) => period.id);
+      store.reportRuns = store.reportRuns.filter((run) => run.companyId !== companyId);
+      store.mappings = store.mappings.filter((mapping) => !periodIds.includes(mapping.periodId));
+      store.ledgers = store.ledgers.filter((ledger) => !periodIds.includes(ledger.periodId));
+      store.uploads = store.uploads.filter((upload) => !periodIds.includes(upload.periodId));
+      store.periods = store.periods.filter((period) => period.companyId !== companyId);
+      store.companies = store.companies.filter((candidate) => candidate.id !== companyId);
+      return company;
+    },
     async listPeriodsByIds(companyId, periodIds) {
       if (!periodIds || !periodIds.length) return [];
       return store.periods.filter((period) => period.companyId === companyId && periodIds.includes(period.id));

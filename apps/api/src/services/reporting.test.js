@@ -68,7 +68,8 @@ test('maps common ledger names to Schedule III line items', () => {
     { id: 'ledger-2', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Term Loan', debitAmount: 0, creditAmount: 300000, netAmount: -300000 },
     { id: 'ledger-3', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Accounts Receivable', debitAmount: 150000, creditAmount: 0, netAmount: 150000 },
     { id: 'ledger-4', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Raw Material Purchase', debitAmount: 80000, creditAmount: 0, netAmount: 80000 },
-    { id: 'ledger-5', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Bank Charges', debitAmount: 2500, creditAmount: 0, netAmount: 2500 }
+    { id: 'ledger-5', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Bank Charges', debitAmount: 2500, creditAmount: 0, netAmount: 2500 },
+    { id: 'ledger-6', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Finance Costs', debitAmount: 15000, creditAmount: 0, netAmount: 15000 }
   ];
 
   const mappings = mapLedgers(ledgers);
@@ -77,6 +78,7 @@ test('maps common ledger names to Schedule III line items', () => {
   assert.equal(mappings.find((item) => item.rawName === 'Accounts Receivable').scheduleLineId, 'trade_receivables');
   assert.equal(mappings.find((item) => item.rawName === 'Raw Material Purchase').scheduleLineId, 'materials_consumed');
   assert.equal(mappings.find((item) => item.rawName === 'Bank Charges').scheduleLineId, 'finance_costs');
+  assert.equal(mappings.find((item) => item.rawName === 'Finance Costs').scheduleLineId, 'finance_costs');
 });
 
 test('generates result workbook with comparative period values in the correct columns', async () => {
