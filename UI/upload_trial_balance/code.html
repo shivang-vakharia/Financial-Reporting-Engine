@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AuditExpress - Upload Trial Balance</title>
+<!-- Google Fonts: Inter & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#131b2e",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "on-tertiary-container": "#75859d",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#316bf3",
+                        "tertiary": "#000000",
+                        "surface-container": "#eceef0",
+                        "outline": "#76777d",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-error-container": "#93000a",
+                        "secondary": "#0051d5",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-primary-container": "#7c839b",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sidebar-collapsed-width": "64px",
+                        "gutter": "12px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sidebar-width": "240px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["24px", { lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "600" }],
+                        "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "data-mono": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-sm": ["16px", { lineHeight: "24px", fontWeight: "600" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom overrides for strictly flat design */
+        input:focus, select:focus, textarea:focus {
+            box-shadow: none !important;
+            border-color: #000000 !important; /* Force primary color on focus */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased h-screen flex overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-lowest border-r border-outline-variant flex flex-col py-lg z-50">
+<!-- Brand / Header -->
+<div class="px-md mb-xl flex items-center gap-md">
+<div class="w-8 h-8 bg-surface-container-high rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">domain</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary">CA Portal</h2>
+<p class="font-body-sm text-body-sm text-secondary">Professional Suite</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 px-sm flex flex-col gap-xs">
+<!-- Active Tab: Workspace (Semantic match for data entry/upload) -->
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container px-md py-sm rounded-lg cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-body-sm text-body-sm font-medium">Workspace</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-sm text-body-sm">Reports</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col ml-sidebar-width h-full relative">
+<!-- TopAppBar (Shared Component) -->
+<header class="sticky top-0 z-40 w-full bg-surface border-b border-outline-variant flex justify-between items-center h-12 px-lg">
+<!-- Brand Logo -->
+<div class="flex items-center gap-md">
+<h1 class="font-headline-md text-headline-md font-black text-primary">AuditExpress</h1>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex gap-xl h-full items-end">
+<a class="text-on-surface-variant pb-1 hover:text-primary transition-all duration-200 font-label-md text-label-md" href="#">Firm Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 transition-all duration-200 font-label-md text-label-md" href="#">Client List</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span></button>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors"><span class="material-symbols-outlined text-[20px]">help_outline</span></button>
+</div>
+<button class="h-8 px-md bg-primary text-on-primary font-label-md text-label-md rounded flex items-center justify-center hover:opacity-90 transition-opacity">
+                    Generate Report
+                </button>
+<div class="w-8 h-8 rounded bg-surface-container-high overflow-hidden shrink-0 border border-outline-variant">
+<img alt="CA Profile" class="w-full h-full object-cover" data-alt="A macro, extremely detailed headshot photograph of a professional chartered accountant wearing a sharp, modern navy business suit. The lighting is bright, clean, and high-key, creating a pristine corporate aesthetic typical of a high-end financial firm profile picture. Neutral white background, razor-sharp focus on the subject's face." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0ok0DXm7pH8PCOvEwG8j1_KUz4RrvmzgUTv9E29ERwSl2jIwh8jMYGoeped2XVBZNEhDx7MCFgVjEY_kYR2FEdc6SYTc6wIz4bT9afr1JV1ThBwivth7qiDcxi00L8cp21z04e8x639fie1eCah-wreB4PyUdNOdQemHAJD5-qO0Bd-hl3Y1c3wZEmAq8DDwm9GjyNwwQp1xrd02DIWMjDRoI2ctvcrVVFd6RjnV6lT2EBrdfBrVKShD4qdfCnUMAOAKMQBk1hKe_"/>
+</div>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<main class="flex-1 overflow-y-auto p-lg bg-surface flex flex-col gap-lg">
+<!-- Header & Breadcrumbs -->
+<div class="flex flex-col gap-xs">
+<div class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+<span>Client List</span>
+<span>/</span>
+<span>Acme Corp</span>
+<span>/</span>
+<span class="text-primary font-medium">Upload Trial Balance</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary">Upload Trial Balance</h1>
+</div>
+<!-- Top Section: Context Selection (Level 1 Card) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded p-md flex flex-col gap-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Company Selection -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="company-select">Company Entity</label>
+<select 0="" 20="" 20\"="" class="h-8 border border-outline-variant rounded bg-surface-container-lowest text-on-surface font-body-md text-body-md px-sm focus:border-primary focus:ring-0 appearance-none bg-no-repeat bg-right" height='\"20\"' id="company-select" none\"="" style="background-image: url('data:image/svg+xml;utf8,&lt;svg fill=\" viewbox='\"0' width='\"20\"' xmlns='\"http://www.w3.org/2000/svg\"'>'); background-position: right 8px center;"&gt;
+                            <option value="acme_main">Acme Corp - Global Consolidated</option>
+<option value="acme_na">Acme Corp - North America</option>
+<option value="acme_eu">Acme Corp - Europe</option>
+</select>
+</div>
+<!-- Reporting Period Selection -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="period-select">Reporting Period</label>
+<select 0="" 20="" 20\"="" class="h-8 border border-outline-variant rounded bg-surface-container-lowest text-on-surface font-body-md text-body-md px-sm focus:border-primary focus:ring-0 appearance-none bg-no-repeat bg-right" height='\"20\"' id="period-select" none\"="" style="background-image: url('data:image/svg+xml;utf8,&lt;svg fill=\" viewbox='\"0' width='\"20\"' xmlns='\"http://www.w3.org/2000/svg\"'>'); background-position: right 8px center;"&gt;
+                            <option value="fy23_q4">FY 2023 - Q4 (Dec 31)</option>
+<option value="fy23_q3">FY 2023 - Q3 (Sep 30)</option>
+<option value="fy23_q2">FY 2023 - Q2 (Jun 30)</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Main Area: Drag & Drop Zone -->
+<section class="border border-dashed border-outline-variant bg-surface-container-lowest rounded-lg p-xl flex flex-col items-center justify-center gap-sm text-center min-h-[200px] hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant group-hover:text-on-primary-fixed">upload_file</span>
+</div>
+<div>
+<p class="font-headline-sm text-headline-sm text-primary">Drag &amp; Drop Trial Balance file</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Supports .xlsx, .xls, .csv (Max 50MB)</p>
+</div>
+<button class="mt-sm h-8 px-md border border-outline-variant text-on-surface font-label-md text-label-md rounded flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                    Browse Files
+                </button>
+</section>
+<!-- Validation Summary (Visible post-upload simulation) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded flex flex-col overflow-hidden">
+<div class="bg-surface-container px-md py-sm border-b border-outline-variant flex items-center justify-between">
+<h3 class="font-label-md text-label-md font-bold text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">fact_check</span>
+                        Validation Summary
+                    </h3>
+<span class="font-data-mono text-data-mono text-on-surface-variant">File: ACME_TB_FY23_Q4_v2.xlsx</span>
+</div>
+<div class="p-md flex flex-col gap-md">
+<!-- Metrics Row -->
+<div class="flex gap-xl border-b border-outline-variant pb-md">
+<div class="flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Rows Parsed</span>
+<span class="font-data-mono text-headline-md text-primary">12,450</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</span>
+<!-- Status Badge: Balanced -->
+<div class="inline-flex items-center gap-xs bg-[#e6f4ea] text-[#137333] px-sm py-[2px] rounded font-label-md text-label-md border border-[#ceead6]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                Balanced
+                            </div>
+</div>
+<div class="flex flex-col gap-xs ml-auto text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Net Variance</span>
+<span class="font-data-mono text-headline-md text-primary">0.00</span>
+</div>
+</div>
+<!-- Warning Banner -->
+<div class="bg-error-container border border-[#ffb4ab] rounded p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-on-error-container mt-[2px] text-[18px]">warning</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-error-container">Suspicious Mappings Detected</span>
+<span class="font-body-sm text-body-sm text-on-error-container mt-[2px]">4 accounts in the 6000-series (Operating Expenses) have unconventional debit/credit patterns based on historical data. Review required during mapping phase.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Actions -->
+<div class="mt-auto flex justify-end gap-sm pt-md border-t border-outline-variant">
+<button class="h-8 px-md border border-outline-variant text-on-surface font-label-md text-label-md rounded flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                    Cancel
+                </button>
+<button class="h-8 px-md bg-primary text-on-primary font-label-md text-label-md rounded flex items-center justify-center gap-xs hover:opacity-90 transition-opacity">
+                    Proceed to Mapping
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledger Mapping Review - AuditExpress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#131b2e",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "on-tertiary-container": "#75859d",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#316bf3",
+                        "tertiary": "#000000",
+                        "surface-container": "#eceef0",
+                        "outline": "#76777d",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-error-container": "#93000a",
+                        "secondary": "#0051d5",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-primary-container": "#7c839b",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sidebar-collapsed-width": "64px",
+                        "gutter": "12px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sidebar-width": "240px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "data-mono": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for high-density tables */
+        .table-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: #f7f9fb; 
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #c6c6cd; 
+            border-radius: 4px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+            background: #76777d; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden md:flex flex-col bg-surface-container-lowest dark:bg-surface-container-low fixed left-0 top-0 h-full w-sidebar-width border-r border-outline-variant dark:border-outline py-lg font-body-sm text-body-sm z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-headline-sm font-bold">
+                    CA
+                </div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">CA Portal</span>
+<span class="text-on-surface-variant text-[10px] uppercase tracking-wider font-semibold">Professional Suite</span>
+</div>
+</div>
+</div>
+<div class="flex-1 px-sm space-y-base">
+<!-- Active: Workspace -->
+<a class="flex items-center gap-md bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary px-md py-sm rounded-lg cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="dashboard">dashboard</span>
+                Workspace
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-surface-variant px-md py-sm hover:bg-surface-container-high dark:hover:bg-surface-container rounded-lg cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Reports
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-surface-variant px-md py-sm hover:bg-surface-container-high dark:hover:bg-surface-container rounded-lg cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-sidebar-width flex flex-col min-w-0">
+<!-- TopAppBar (Shared Component) -->
+<header class="bg-surface dark:bg-surface-dim sticky top-0 z-40 w-full border-b border-outline-variant dark:border-outline flex justify-between items-center h-[48px] px-lg font-label-md text-label-md">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed">AuditExpress</span>
+<nav class="hidden sm:flex items-center gap-lg mt-1">
+<a class="text-primary dark:text-secondary-fixed font-bold border-b-2 border-primary dark:border-secondary-fixed pb-1 hover:text-primary dark:hover:text-primary-fixed transition-all duration-200" href="#">Firm Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant pb-1 hover:text-primary dark:hover:text-primary-fixed transition-all duration-200" href="#">Client List</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center text-on-surface-variant">
+<button aria-label="Notifications" class="p-1 hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="Help" class="p-1 hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<button class="h-[32px] px-md bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-inverse-surface transition-colors">
+                    Generate Report
+                </button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant overflow-hidden flex-shrink-0 cursor-pointer ml-sm">
+<img alt="CA Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a Chartered Accountant in a modern office environment, wearing a tailored navy suit. The lighting is crisp and cool, casting soft shadows, conveying a sense of corporate authority and precision. The background is slightly blurred with subtle geometric architectural details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAUe0VNWanLGTgJkVOy4PLRamJN6Vw3MZ0mMyEt7PPiTuhCKjMITW8AVfuTKvk8TOEJQhACPyDtTfxG_QgJ7U7wCAQ0jNg-OqBExCta7X9bwQtoefSf1eIAqJrVAf9FSOL8R_XnT-sX5_2dXON8IyuKWWT8ryCvANsHPAF6EDVAEiahDMw-hxQPSFTZfiimqoAcxonA1Rso0H1nzby1SMRi6s2bMOlsY_IDZY7dVid6DZMzkFzjM1IJXYCgdIyaWaJS2tRdk9XchYc"/>
+</div>
+</div>
+</header>
+<!-- Canvas / Page Content -->
+<main class="flex-1 p-lg flex flex-col gap-lg max-w-[1600px] mx-auto w-full">
+<!-- Page Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-md pb-sm">
+<div>
+<!-- Breadcrumb -->
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm">
+<span>Workspace</span>
+<span class="text-outline">/</span>
+<span>Acme Corp Audit 2023</span>
+<span class="text-outline">/</span>
+<span class="text-primary font-bold">Mapping Review</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary m-0">Ledger Mapping Review</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Review and finalize trial balance to schedule mappings before generating leadsheets.</p>
+</div>
+<div class="flex gap-md">
+<button class="h-[36px] px-md border border-outline-variant rounded font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                        Export TB
+                    </button>
+<button class="h-[36px] px-md bg-secondary text-on-secondary rounded font-label-md text-label-md hover:opacity-90 transition-opacity shadow-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+                        Confirm Mappings &amp; Generate
+                    </button>
+</div>
+</div>
+<!-- Exceptions Alert Panel -->
+<div class="bg-error-container border border-[#ffb4ab] rounded-lg p-md flex items-start gap-md shadow-sm">
+<span class="material-symbols-outlined text-on-error-container fill-icon mt-[2px]" data-icon="warning">warning</span>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-error-container m-0">Unmapped Ledger Exceptions</h3>
+<p class="font-body-sm text-body-sm text-[#93000a] mt-xs mb-sm">There are 3 accounts with non-zero balances that have not been assigned to a reporting schedule. These must be mapped or explicitly excluded before proceeding.</p>
+<!-- Quick exception list -->
+<div class="bg-surface-container-lowest rounded border border-[#ffb4ab] divide-y divide-[#ffb4ab]">
+<div class="flex items-center justify-between p-sm text-body-sm">
+<div class="flex gap-md">
+<span class="font-data-mono text-data-mono font-medium">4990-00</span>
+<span class="text-on-surface">Suspense / Clearing Account</span>
+</div>
+<span class="font-data-mono text-data-mono font-medium text-on-error-container">$4,520.00</span>
+</div>
+<div class="flex items-center justify-between p-sm text-body-sm">
+<div class="flex gap-md">
+<span class="font-data-mono text-data-mono font-medium">7850-10</span>
+<span class="text-on-surface">Misc Exp - Uncategorized</span>
+</div>
+<span class="font-data-mono text-data-mono font-medium text-on-error-container">$1,205.50</span>
+</div>
+<div class="flex items-center justify-between p-sm text-body-sm">
+<div class="flex gap-md">
+<span class="font-data-mono text-data-mono font-medium">2190-00</span>
+<span class="text-on-surface">Accrued Liabilities - Other</span>
+</div>
+<span class="font-data-mono text-data-mono font-medium text-on-error-container">($8,400.00)</span>
+</div>
+</div>
+</div>
+<button class="text-label-sm font-label-sm text-on-error-container uppercase hover:underline ml-auto mt-xs">Auto-Map Remaining</button>
+</div>
+<!-- High-Density Data Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg flex flex-col flex-1 overflow-hidden shadow-sm">
+<!-- Table Toolbar -->
+<div class="flex items-center justify-between p-sm border-b border-outline-variant bg-surface-bright">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" data-icon="search">search</span>
+<input class="h-[32px] pl-xl pr-sm border border-outline-variant rounded text-body-sm w-[240px] focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-shadow" placeholder="Search accounts..." type="text"/>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<label class="flex items-center gap-xs text-body-sm text-on-surface cursor-pointer">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary w-4 h-4" type="checkbox"/>
+                            Show Unmapped Only
+                        </label>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant flex gap-md">
+<span>Total Rows: 412</span>
+<span class="text-outline">|</span>
+<span>Mapped: 409</span>
+</div>
+</div>
+<!-- Table Container -->
+<div class="flex-1 overflow-auto table-scroll relative min-h-[400px]">
+<table class="w-full text-left border-collapse min-w-[900px]">
+<thead class="sticky top-0 z-10 bg-[#F1F5F9] border-b border-outline-variant shadow-[0_1px_0_0_#e2e8f0]">
+<tr>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase w-[120px]">Account Code</th>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase">Account Name</th>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase text-right w-[160px]">TB Amount</th>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase w-[280px]">Mapped Schedule</th>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase text-center w-[120px]">Mapping Type</th>
+<th class="py-[12px] px-gutter font-label-sm text-label-sm text-on-surface-variant uppercase w-[60px]"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+<!-- Row 1: Normal System Mapped -->
+<tr class="hover:bg-surface-container-lowest transition-colors h-[40px]">
+<td class="px-gutter font-data-mono text-data-mono">1010-00</td>
+<td class="px-gutter truncate max-w-[200px]" title="Operating Account - Chase">Operating Account - Chase</td>
+<td class="px-gutter font-data-mono text-data-mono text-right">$ 1,245,000.00</td>
+<td class="px-gutter">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span>A. Cash and Cash Equivalents</span>
+</div>
+</td>
+<td class="px-gutter text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-secondary-fixed text-on-secondary-fixed">System</span>
+</td>
+<td class="px-gutter text-center">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<!-- Row 2: Normal Manual Mapped (Zebra) -->
+<tr class="bg-[#F8FAFC] hover:bg-surface-container-lowest transition-colors h-[40px]">
+<td class="px-gutter font-data-mono text-data-mono">1200-10</td>
+<td class="px-gutter truncate max-w-[200px]" title="Accounts Receivable - Trade">Accounts Receivable - Trade</td>
+<td class="px-gutter font-data-mono text-data-mono text-right">$ 450,230.50</td>
+<td class="px-gutter">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span>B. Accounts Receivable</span>
+</div>
+</td>
+<td class="px-gutter text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant">Manual</span>
+</td>
+<td class="px-gutter text-center">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<!-- Row 3: Unmapped Exception (Error state) -->
+<tr class="bg-error-container/20 hover:bg-error-container/40 transition-colors h-[40px] border-b border-[#ffb4ab]">
+<td class="px-gutter font-data-mono text-data-mono font-medium text-on-error-container">2190-00</td>
+<td class="px-gutter text-on-error-container font-medium">Accrued Liabilities - Other</td>
+<td class="px-gutter font-data-mono text-data-mono text-right text-on-error-container font-medium">($ 8,400.00)</td>
+<td class="px-gutter">
+<select class="w-full h-[28px] text-[12px] border-[#ffb4ab] rounded bg-white text-on-surface focus:ring-1 focus:ring-error focus:border-error px-2 py-0 leading-tight">
+<option disabled="" selected="" value="">Select Schedule...</option>
+<option value="A">A. Cash and Cash Equivalents</option>
+<option value="B">B. Accounts Receivable</option>
+<option value="AA">AA. Accrued Liabilities</option>
+</select>
+</td>
+<td class="px-gutter text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-[#ffb4ab] text-[#93000a]">Unmapped</span>
+</td>
+<td class="px-gutter text-center">
+<span class="material-symbols-outlined text-[18px] text-error" data-icon="priority_high">priority_high</span>
+</td>
+</tr>
+<!-- Row 4: Normal System Mapped -->
+<tr class="hover:bg-surface-container-lowest transition-colors h-[40px]">
+<td class="px-gutter font-data-mono text-data-mono">5100-00</td>
+<td class="px-gutter truncate max-w-[200px]" title="Cost of Goods Sold - Materials">Cost of Goods Sold - Materials</td>
+<td class="px-gutter font-data-mono text-data-mono text-right">$ 890,100.00</td>
+<td class="px-gutter">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span>40. Cost of Sales</span>
+</div>
+</td>
+<td class="px-gutter text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-secondary-fixed text-on-secondary-fixed">System</span>
+</td>
+<td class="px-gutter text-center">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<!-- Row 5: Normal System Mapped (Zebra) -->
+<tr class="bg-[#F8FAFC] hover:bg-surface-container-lowest transition-colors h-[40px]">
+<td class="px-gutter font-data-mono text-data-mono">6010-00</td>
+<td class="px-gutter truncate max-w-[200px]" title="Salaries &amp; Wages">Salaries &amp; Wages</td>
+<td class="px-gutter font-data-mono text-data-mono text-right">$ 320,000.00</td>
+<td class="px-gutter">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span>50. Payroll Expenses</span>
+</div>
+</td>
+<td class="px-gutter text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-secondary-fixed text-on-secondary-fixed">System</span>
+</td>
+<td class="px-gutter text-center">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer/Pagination (Simplified for high density) -->
+<div class="p-xs px-sm border-t border-outline-variant bg-surface-container-lowest flex justify-end items-center gap-sm text-label-sm text-on-surface-variant">
+<span>Rows per page: 100</span>
+<span class="material-symbols-outlined text-[16px] cursor-pointer" data-icon="arrow_drop_down">arrow_drop_down</span>
+<span class="ml-md">1-100 of 412</span>
+<div class="flex gap-xs ml-sm">
+<button class="p-1 hover:bg-surface-container-high rounded" disabled=""><span class="material-symbols-outlined text-[18px] text-outline-variant" data-icon="chevron_left">chevron_left</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

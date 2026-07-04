@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CA Portal - Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#131b2e",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "on-tertiary-container": "#75859d",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#316bf3",
+                        "tertiary": "#000000",
+                        "surface-container": "#eceef0",
+                        "outline": "#76777d",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-error-container": "#93000a",
+                        "secondary": "#0051d5",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-primary-container": "#7c839b",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sidebar-collapsed-width": "64px",
+                        "gutter": "12px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sidebar-width": "240px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "data-mono": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-full flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-full w-sidebar-width border-r border-outline-variant bg-surface-container-lowest py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-md">
+<img class="w-8 h-8 rounded-DEFAULT object-cover" data-alt="A small, professional corporate logo mark consisting of sharp geometric shapes in deep navy blue and slate grey. High contrast, clean lines, suitable for a high-end financial or accounting firm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4xRcGm6BCTDy-8rLF0oh8-c_EqJhF1q6JkL6ulbp5Dgf7wWXMTer5EFz167VUiwbN9nv3RUtVCV6PRKmL1SmhL0X4YHE2B_kFgCKhCprNf38QZIH_7hxjasspGkv5cyySW9wMCWdVem2qdNtTWgYnazbpLiAXI34zdgDM1AoegceaDObC7fdeYpn4bKIgOtwLAv3hvLdtpt2W9-qU-BeD67kodlO2Bsno9SHExFWUNwkFBk-fMYURZKBjb8rnsiFBR0m7ypSFYYAu"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">CA Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-xs">Professional Suite</p>
+</div>
+</div>
+</div>
+<div class="flex-1 px-sm space-y-base">
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container px-md py-sm rounded-lg font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Workspace
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Reports
+            </a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-sidebar-width h-full w-full">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full flex justify-between items-center h-12 px-lg border-b border-outline-variant bg-surface">
+<div class="flex items-center gap-xl h-full">
+<div class="font-headline-md text-headline-md font-black text-primary">AuditExpress</div>
+<nav class="hidden md:flex items-center gap-lg h-full pt-1">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 h-full flex items-center hover:text-primary transition-all duration-200" href="#">Firm Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant pb-1 h-full flex items-center hover:text-primary transition-all duration-200 border-b-2 border-transparent" href="#">Client List</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-DEFAULT hover:opacity-90 transition-opacity ml-sm h-8 flex items-center">
+                    Generate Report
+                </button>
+<img class="w-8 h-8 rounded-full ml-sm object-cover border border-outline-variant" data-alt="A highly professional headshot of a corporate accountant in a modern, well-lit office setting. Sharp focus, high contrast, clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZGjmkMVrpUYEn5UD9XPl8VF9Xvw2f-pHtlG1xfgY0wVbAHMcA-vMvnNOxLySPwNzTanAe0p4_EAYbiHMbcDnBBR4Dtd5pqYSxyYqPJ6dGqDxDMq0qY54VTzR2YxZ_nWesz14alpsclRqDcc2leavfXTjQPGQ-C_2CCBWtJn3yO89jLj3oI_FK7yVjwcDXyU5VeRuFtSw_zMDNt9VX3m7NnpZm998N7Sq5QRU8QR7dRz7X_sNvcOzcFgaLDlYoTi581CNr4Qjob5VH"/>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-auto p-md md:p-lg">
+<div class="max-w-7xl mx-auto space-y-lg">
+<!-- Header Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Workspace Overview</h2>
+<div class="font-body-md text-body-md text-on-surface-variant mt-xs flex items-center gap-xs">
+                            CA Portal <span class="text-outline-variant">/</span> Workspace
+                        </div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative w-64">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-sm pl-sm pr-xl font-body-md text-body-md focus:border-secondary focus:ring-0 appearance-none h-[36px]">
+<option>All Client Portfolios</option>
+<option>Tech Sector Alpha</option>
+<option>Manufacturing Beta</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">arrow_drop_down</span>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md rounded-DEFAULT hover:opacity-90 transition-opacity h-[36px] flex items-center gap-xs whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Company
+                        </button>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-sm">Active Engagements</div>
+<div class="font-headline-lg text-headline-lg text-primary">24</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-sm">Pending Reviews</div>
+<div class="font-headline-lg text-headline-lg text-primary">7</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-sm">Critical Deadlines</div>
+<div class="font-headline-lg text-headline-lg text-error">2</div>
+</div>
+</div>
+<!-- Dense Table Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface">
+<h3 class="font-headline-sm text-headline-sm text-primary">Client Companies</h3>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-xs pl-xl pr-sm font-body-sm text-body-sm focus:border-secondary focus:ring-0 h-[32px]" placeholder="Filter companies..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="py-gutter px-md font-label-md text-label-md text-on-surface-variant font-semibold">Company Name</th>
+<th class="py-gutter px-md font-label-md text-label-md text-on-surface-variant font-semibold text-right">Last Period</th>
+<th class="py-gutter px-md font-label-md text-label-md text-on-surface-variant font-semibold text-right">Revenue (YTD)</th>
+<th class="py-gutter px-md font-label-md text-label-md text-on-surface-variant font-semibold">Reporting Status</th>
+<th class="py-gutter px-md font-label-md text-label-md text-on-surface-variant font-semibold text-right w-[100px]">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="py-gutter px-md font-medium text-primary">Acme Corp Industries</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">Q3 2023</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">$4,250,000</td>
+<td class="py-gutter px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-secondary-container text-on-secondary-container">
+                                            In Progress
+                                        </span>
+</td>
+<td class="py-gutter px-md text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant bg-surface hover:bg-surface-container transition-colors">
+<td class="py-gutter px-md font-medium text-primary">Global Tech Solutions</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">Q4 2023</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">$12,800,500</td>
+<td class="py-gutter px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant">
+                                            Finalized
+                                        </span>
+</td>
+<td class="py-gutter px-md text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="py-gutter px-md font-medium text-primary">Zenith Manufacturing</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">Q2 2023</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">$1,150,000</td>
+<td class="py-gutter px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-error-container text-on-error-container">
+                                            Pending
+                                        </span>
+</td>
+<td class="py-gutter px-md text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="border-b border-outline-variant bg-surface hover:bg-surface-container transition-colors">
+<td class="py-gutter px-md font-medium text-primary">Meridian Logistics</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">Q3 2023</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">$8,920,000</td>
+<td class="py-gutter px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-secondary-container text-on-secondary-container">
+                                            In Progress
+                                        </span>
+</td>
+<td class="py-gutter px-md text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-gutter px-md font-medium text-primary">Apex Retail Group</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">Q1 2024</td>
+<td class="py-gutter px-md text-right font-data-mono text-data-mono text-on-surface-variant">$3,450,200</td>
+<td class="py-gutter px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant">
+                                            Finalized
+                                        </span>
+</td>
+<td class="py-gutter px-md text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Professional Suite</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-surface-variant": "#45464d",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "primary-container": "#131b2e",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#565e74",
+                    "on-tertiary-container": "#75859d",
+                    "primary": "#000000",
+                    "inverse-on-surface": "#eff1f3",
+                    "secondary-fixed": "#dbe1ff",
+                    "on-secondary-fixed-variant": "#003ea8",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#191c1e",
+                    "on-secondary-fixed": "#00174b",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-primary-fixed": "#131b2e",
+                    "primary-fixed": "#dae2fd",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-container": "#316bf3",
+                    "tertiary": "#000000",
+                    "surface-container": "#eceef0",
+                    "outline": "#76777d",
+                    "surface": "#f7f9fb",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "background": "#f7f9fb",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e0e3e5",
+                    "surface-bright": "#f7f9fb",
+                    "on-surface": "#191c1e",
+                    "surface-dim": "#d8dadc",
+                    "on-error-container": "#93000a",
+                    "secondary": "#0051d5",
+                    "on-secondary-container": "#fefcff",
+                    "inverse-primary": "#bec6e0",
+                    "on-error": "#ffffff",
+                    "outline-variant": "#c6c6cd",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-primary-container": "#7c839b",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#0b1c30",
+                    "surface-container-high": "#e6e8ea",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#f2f4f6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "xl": "32px",
+                    "base": "4px",
+                    "md": "16px",
+                    "sidebar-collapsed-width": "64px",
+                    "gutter": "12px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "sidebar-width": "240px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "data-mono": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "data-mono": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom utilities for strict form styling */
+        .form-input {
+            box-shadow: none !important; /* Overriding default tailwind form ring if present */
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center p-md antialiased text-on-surface">
+<!-- Login Container -->
+<div class="w-full max-w-[360px] bg-surface-container-lowest border border-surface-variant rounded-lg p-lg shadow-sm">
+<!-- Brand / Header -->
+<div class="flex flex-col items-center mb-lg">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded mb-sm">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary">AuditExpress</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Professional Suite Authentication</p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-md" onsubmit="event.preventDefault();">
+<!-- Firm ID -->
+<div class="flex flex-col gap-base">
+<label class="font-label-md text-label-md text-on-surface" for="firm-id">Firm ID</label>
+<input class="form-input border border-outline-variant rounded bg-surface-container-lowest px-sm py-[8px] font-body-md text-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="firm-id" name="firm-id" placeholder="e.g. CA-001" required="" type="text"/>
+</div>
+<!-- Username -->
+<div class="flex flex-col gap-base">
+<label class="font-label-md text-label-md text-on-surface" for="username">Username</label>
+<input class="form-input border border-outline-variant rounded bg-surface-container-lowest px-sm py-[8px] font-body-md text-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="username" name="username" required="" type="text"/>
+</div>
+<!-- Password -->
+<div class="flex flex-col gap-base">
+<div class="flex justify-between items-end">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-secondary hover:text-on-secondary-fixed-variant transition-colors" href="#">Forgot Password?</a>
+</div>
+<input class="form-input border border-outline-variant rounded bg-surface-container-lowest px-sm py-[8px] font-body-md text-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="password" name="password" required="" type="password"/>
+</div>
+<!-- Actions -->
+<div class="mt-sm pt-sm">
+<button class="w-full h-[36px] bg-primary text-on-primary font-label-md text-label-md rounded flex items-center justify-center hover:bg-inverse-surface active:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" type="submit">
+                    Sign In
+                </button>
+</div>
+</form>
+<!-- Footer Info -->
+<div class="mt-lg pt-md border-t border-surface-variant text-center">
+<p class="font-label-sm text-label-sm text-outline flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                Secure 256-bit Encryption
+            </p>
+</div>
+</div>
+</body></html>

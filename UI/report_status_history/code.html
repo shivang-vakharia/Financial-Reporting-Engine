@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Report Generation Status and History | AuditExpress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface-variant": "#45464d",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#131b2e",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "on-tertiary-container": "#75859d",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed": "#dbe1ff",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed": "#00174b",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#316bf3",
+                        "tertiary": "#000000",
+                        "surface-container": "#eceef0",
+                        "outline": "#76777d",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-error-container": "#93000a",
+                        "secondary": "#0051d5",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-primary-container": "#7c839b",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#0b1c30",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sidebar-collapsed-width": "64px",
+                        "gutter": "12px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sidebar-width": "240px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "data-mono": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Table Styles */
+        .data-table th { background-color: #F1F5F9; padding: 12px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid theme('colors.outline-variant'); }
+        .data-table td { padding: 12px; border-bottom: 1px solid theme('colors.outline-variant'); }
+        .data-table tbody tr:nth-child(even) { background-color: theme('colors.surface-bright'); }
+        .data-table tbody tr:nth-child(odd) { background-color: theme('colors.surface-container-lowest'); }
+        .numeric-cell { text-align: right; font-family: theme('fontFamily.data-mono'); font-size: theme('fontSize.data-mono')[0]; font-weight: theme('fontSize.data-mono')[1].fontWeight; line-height: theme('fontSize.data-mono')[1].lineHeight; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-sidebar-width bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline flex flex-col h-full py-lg z-50 hidden md:flex">
+<div class="px-md mb-xl flex items-center gap-md">
+<img alt="Firm Logo" class="h-8 w-8 rounded object-cover" data-alt="A minimal, geometric placeholder logo for an accounting firm, using solid dark blue and gray shapes on a stark white background. Sharp edges and professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARZZoqnyCA1CkAYHxCHPsJvzlwrq79Cukmm2BWvleK0CbkEEaRBQVUWFPxN4qGf5dLd5BFUnxY9c1VWRLENx8vMP1Ibm3l6GcN8zP1CUWRh7Bk2N72L4-kxgy7gEpN0RiSB4rmXX1B6cGdSOK5-HvUuOwrRRkaILOi53fTnGWXO-tnKHCt-VBomB1M5X-QQ4omLW6NH-6fRqjrprTAsSZiPTogTy6fH9wgts4nT4ybH0boPfrb5C0YtQp2QA0t_JiDo8hY3FNZCM8Q"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">CA Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Professional Suite</p>
+</div>
+</div>
+<ul class="flex-1 px-sm space-y-sm">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-surface-variant px-md py-sm hover:bg-surface-container-high dark:hover:bg-surface-container rounded-lg font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Workspace
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary px-md py-sm rounded-lg font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+                    Reports
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-surface-variant px-md py-sm hover:bg-surface-container-high dark:hover:bg-surface-container rounded-lg font-body-sm text-body-sm cursor-pointer active:opacity-80 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-sidebar-width flex flex-col min-w-0">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline flex justify-between items-center h-12 px-lg transition-all duration-200">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed md:hidden">AuditExpress</span>
+<nav class="hidden md:flex gap-lg font-label-md text-label-md">
+<a class="text-on-surface-variant dark:text-surface-variant pb-1 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Firm Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant pb-1 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Client List</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary h-[32px] px-md rounded font-label-md text-label-md hover:opacity-90 transition-opacity">Generate Report</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">help_outline</span></button>
+<img alt="CA Profile" class="h-8 w-8 rounded-full border border-outline-variant object-cover" data-alt="A small, circular avatar image of a professional accountant in business attire, looking directly at the camera with a neutral expression. Clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmzYDObHMP2FuVO9NFA5zKnrr-d_9ndQdfBsmxmNV48xLyUI4driUadXMmHiK0IyOycZYlkaWXeIfGNwaKvCh1OmPxBDaln9K5Yy9fR1zFT4dQg-G_gQbUUH_b0za1h-gzk6VO92z8Gb3NERvFLsdHfdMCOV9K0o0zrwe7455wXiE6QNI9O-2fol2qX8lxJZKCoen2qsYACkF3tC7ngmWml8_Ntr09Sb5yhw8WYfNAKYo76a-ov7gaANiFLJmDSx1BlCSx4QcGz_bu"/>
+</div>
+</header>
+<!-- Canvas Area -->
+<main class="flex-1 p-4 md:p-lg lg:p-[24px] overflow-auto">
+<!-- Breadcrumbs & Title -->
+<div class="mb-lg">
+<nav class="flex items-center gap-sm font-label-md text-label-md text-on-surface-variant mb-sm">
+<a class="hover:text-primary" href="#">Reports</a>
+<span>/</span>
+<span class="text-primary">Generation Status</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Report Generation Status and History</h2>
+</div>
+<!-- Current Generation Progress Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg mb-xl shadow-sm">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-xs">Generating: FY2023 Q4 Consolidated Financials</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Client: Acme Corp International</p>
+</div>
+<span class="inline-flex items-center gap-xs bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-1 rounded font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+                        Processing
+                    </span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-2 mb-sm overflow-hidden">
+<div class="bg-secondary h-2 rounded-full transition-all duration-500 ease-out" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between font-label-md text-label-md text-on-surface-variant">
+<span>Compiling variance analysis...</span>
+<span>65%</span>
+</div>
+</div>
+<!-- Excel Download History Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+<div class="p-md border-b border-outline-variant bg-surface flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Excel Download History</h3>
+<div class="flex gap-sm">
+<button class="border border-outline-variant text-primary px-sm py-xs rounded font-label-md text-label-md hover:bg-surface-container-low flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full data-table text-left border-collapse">
+<thead>
+<tr class="font-label-md text-label-md text-on-surface-variant">
+<th class="w-2/5">Report Name</th>
+<th class="w-1/5">Generated Date</th>
+<th class="w-1/5">Version</th>
+<th class="w-1/5 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-primary">
+<tr>
+<td class="font-medium">FY2023 Q3 Tax Audit Summary</td>
+<td>Oct 15, 2023 14:30</td>
+<td class="numeric-cell text-left">v1.2.4</td>
+<td class="text-right">
+<button class="text-secondary hover:text-on-secondary-fixed-variant font-label-md text-label-md flex items-center justify-end gap-xs w-full">
+<span class="material-symbols-outlined text-[16px]">download</span> Download
+                                    </button>
+</td>
+</tr>
+<tr>
+<td class="font-medium">Interim Compliance Report - Alpha Beta</td>
+<td>Oct 12, 2023 09:15</td>
+<td class="numeric-cell text-left">v1.0.0</td>
+<td class="text-right">
+<button class="text-secondary hover:text-on-secondary-fixed-variant font-label-md text-label-md flex items-center justify-end gap-xs w-full">
+<span class="material-symbols-outlined text-[16px]">download</span> Download
+                                    </button>
+</td>
+</tr>
+<tr>
+<td class="font-medium">Risk Assessment Matrix H1</td>
+<td>Sep 28, 2023 16:45</td>
+<td class="numeric-cell text-left">v2.1.0</td>
+<td class="text-right">
+<button class="text-secondary hover:text-on-secondary-fixed-variant font-label-md text-label-md flex items-center justify-end gap-xs w-full">
+<span class="material-symbols-outlined text-[16px]">download</span> Download
+                                    </button>
+</td>
+</tr>
+<tr>
+<td class="font-medium">Annual Subsidiary Ledger Reconciliation</td>
+<td>Sep 10, 2023 11:20</td>
+<td class="numeric-cell text-left">v1.5.2</td>
+<td class="text-right">
+<button class="text-secondary hover:text-on-secondary-fixed-variant font-label-md text-label-md flex items-center justify-end gap-xs w-full">
+<span class="material-symbols-outlined text-[16px]">download</span> Download
+                                    </button>
+</td>
+</tr>
+<tr>
+<td class="font-medium">Inventory Valuation Adjustment Log</td>
+<td>Aug 22, 2023 10:05</td>
+<td class="numeric-cell text-left">v1.1.1</td>
+<td class="text-right">
+<button class="text-secondary hover:text-on-secondary-fixed-variant font-label-md text-label-md flex items-center justify-end gap-xs w-full">
+<span class="material-symbols-outlined text-[16px]">download</span> Download
+                                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+</body></html>
