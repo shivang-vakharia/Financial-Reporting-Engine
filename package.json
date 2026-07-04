@@ -1,0 +1,18 @@
+{
+  "name": "financial-reporting-engine",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/api",
+    "test": "npm run test -w apps/api"
+  },
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
