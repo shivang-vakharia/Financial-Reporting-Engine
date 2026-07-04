@@ -1,4 +1,5 @@
 let token = '';
+
 // Resolve API base URL in priority order:
 // 1. Vite build-time env: import.meta.env.VITE_API_URL
 // 2. Runtime-injected window.__ENV__.VITE_API_URL or window.__API_URL__

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Building2, Download, FileSpreadsheet, LayoutDashboard, LogOut, Plus, Settings, Upload, Wand2 } from 'lucide-react';
-import { api, downloadFile, setToken } from './services/api.js';
+import { api, downloadFile, setToken } from './services/api-runtime.js';
 import './styles.css';
 
 function App() {
