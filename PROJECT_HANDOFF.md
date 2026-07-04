@@ -444,6 +444,26 @@ Suggested tasks:
 - [ ] Add backend tests for comparative period aggregation.
 - [ ] Keep fallback behavior when comparative periods are missing.
 
+### Sprint 3 Manual Test Workflow
+
+Use the sample fixtures in `samples/trial-balance/` and compare generated output with the expected workbooks in `samples/expected-report/`.
+
+1. Start the app: `npm run dev` from the repo root.
+2. Sign up or log in via the frontend at `http://localhost:5173`.
+3. Create a company and a current reporting period for `FY 2025-26 Q1`.
+4. Upload `samples/trial-balance/TB-Q1-2025-26.xlsx` to that period.
+5. Create prior periods and upload the comparative files:
+   - `samples/trial-balance/TB-Q4-2024-25.xlsx` for `FY 2024-25 Q4`
+   - `samples/trial-balance/TB-Annual-2024-25.xlsx` for `FY 2024-25 Annual`
+6. Generate the report and, if prompted, select the comparative periods.
+7. Download the generated report.
+8. Compare the generated workbook to:
+   - `samples/expected-report/ideal-current-quarter-report.xlsx` for baseline behavior
+   - `samples/expected-report/ideal-current-quarter-report-with-comparatives.xlsx` for comparative period behavior
+9. Note differences in worksheet names, column headers, populated values, and unmapped ledger output.
+
+This workflow helps identify gaps between the current output and the expected Sprint 3 report behavior.
+
 Alternative Sprint 3:
 
 ### Sprint 3: Mapping Rule Expansion

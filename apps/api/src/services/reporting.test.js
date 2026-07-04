@@ -54,12 +54,29 @@ test('parses, maps, and exports a trial balance workbook with unmapped ledgers',
   await report.xlsx.readFile(outputPath);
   assert.ok(report.getWorksheet('Result'));
   assert.ok(report.getWorksheet('SLA'));
-  assert.ok(report.getWorksheet('Segment reoprt'));
+  assert.ok(report.getWorksheet('Segment report'));
   assert.ok(report.getWorksheet('Cash Flow'));
   assert.ok(report.getWorksheet('Changes in Equity'));
   assert.ok(report.getWorksheet('Unmapped Ledgers'));
-  assert.equal(report.getWorksheet('Result').getCell('B9').value, 'Date of start of reporting period ');
+  assert.equal(report.getWorksheet('Result').getCell('B9').value, 'Date of start of reporting period');
   assert.equal(report.getWorksheet('Result').getCell('B12').value, 'Nature of report standalone or consolidated');
+});
+
+test('maps common ledger names to Schedule III line items', () => {
+  const ledgers = [
+    { id: 'ledger-1', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Accounts Payable', debitAmount: 0, creditAmount: 120000, netAmount: -120000 },
+    { id: 'ledger-2', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Term Loan', debitAmount: 0, creditAmount: 300000, netAmount: -300000 },
+    { id: 'ledger-3', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Accounts Receivable', debitAmount: 150000, creditAmount: 0, netAmount: 150000 },
+    { id: 'ledger-4', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Raw Material Purchase', debitAmount: 80000, creditAmount: 0, netAmount: 80000 },
+    { id: 'ledger-5', uploadId: 'upload-1', periodId: 'period-1', rawName: 'Bank Charges', debitAmount: 2500, creditAmount: 0, netAmount: 2500 }
+  ];
+
+  const mappings = mapLedgers(ledgers);
+  assert.equal(mappings.find((item) => item.rawName === 'Accounts Payable').scheduleLineId, 'trade_payables');
+  assert.equal(mappings.find((item) => item.rawName === 'Term Loan').scheduleLineId, 'borrowings_non_current');
+  assert.equal(mappings.find((item) => item.rawName === 'Accounts Receivable').scheduleLineId, 'trade_receivables');
+  assert.equal(mappings.find((item) => item.rawName === 'Raw Material Purchase').scheduleLineId, 'materials_consumed');
+  assert.equal(mappings.find((item) => item.rawName === 'Bank Charges').scheduleLineId, 'finance_costs');
 });
 
 test('generates result workbook with comparative period values in the correct columns', async () => {

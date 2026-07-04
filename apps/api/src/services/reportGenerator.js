@@ -45,7 +45,7 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
 
   const periods = buildDisplayPeriods(period, comparativePeriods);
   setRow(ws, 8, ['', '', periods[0].end, periods[1].end, periods[2].end, periods[0].end, periods[2].end, periods[3].end]);
-  setRow(ws, 9, ['A', 'Date of start of reporting period ', periods[0].start, periods[1].start, periods[2].start, periods[0].start, periods[2].start, periods[3].start]);
+  setRow(ws, 9, ['A', 'Date of start of reporting period', periods[0].start, periods[1].start, periods[2].start, periods[0].start, periods[2].start, periods[3].start]);
   setRow(ws, 10, ['B', 'Date of end of reporting period', { formula: 'C8' }, { formula: 'D8' }, { formula: 'E8' }, { formula: 'F8' }, { formula: 'G8' }, { formula: 'H8' }]);
   setRow(ws, 11, ['C', 'Whether results are audited or unaudited', metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus]);
   setRow(ws, 12, ['D', 'Nature of report standalone or consolidated', metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature]);
@@ -97,7 +97,7 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
   addResultLine(ws, 45, '', 'Paid-up equity share capital', [numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital)]);
   setFormulaAcross(ws, 46, ['', 'Face value of equity share capital (Per Share)', metadata.faceValue || 'Not specified']);
   addResultLine(ws, 47, 'XX', 'Details of Debt Securities', '');
-  addResultLine(ws, 48, '', 'Reserves excluding Revaluaton Reserve', resultCreditValues('other_equity', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addResultLine(ws, 48, '', 'Reserves excluding Revaluation Reserve', resultCreditValues('other_equity', totals, comparativeTotalsByPeriod, comparativePeriods));
   addResultLine(ws, 49, 'XXI', 'Earnings per share', '');
   setFormulaAcross(ws, 50, ['', 'Earnings per share (not annualised for half year / Period ended)', '']);
   addFormulaLine(ws, 51, '', 'Basic earnings (loss) per share from continuing and discotinued operations', 'IF(C45=0,0,C43/(C45/10))');
@@ -142,7 +142,7 @@ function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, com
   addSlaLine(ws, 16, '', '(f) Intangible Assets under Development', [0, 0, 0]);
   addSlaLine(ws, 17, '', '(g) Financial Assets', '');
   addSlaLine(ws, 18, '', 'i. Investments', slaDebitValues('investments', totals, comparativeTotalsByPeriod, comparativePeriods));
-  addSlaLine(ws, 19, '', 'ii. Trade Receivables', [0, 0, 0]);
+  addSlaLine(ws, 19, '', 'ii. Trade Receivables (Non-current)', [0, 0, 0]);
   addSlaLine(ws, 20, '', 'iii. Loan', slaDebitValues('loans_assets', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaLine(ws, 21, '', 'iv. Other Financial Assets', [0, 0, 0]);
   addSlaLine(ws, 22, '', '(h) Deferred tax Assets (net)', [0, 0, 0]);
@@ -153,8 +153,8 @@ function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, com
   addSlaLine(ws, 28, '', '(b) Financial Assets', '');
   addSlaLine(ws, 29, '', 'i. Investments', [0, 0, 0]);
   addSlaLine(ws, 30, '', 'ii. Trade Receivables', slaDebitValues('trade_receivables', totals, comparativeTotalsByPeriod, comparativePeriods));
-  addSlaLine(ws, 31, '', 'iii. Cash and cash Equivalents', slaDebitValues('cash_equivalents', totals, comparativeTotalsByPeriod, comparativePeriods));
-  addSlaLine(ws, 32, '', 'iv. Bank balance other than(iii) above', slaDebitValues('bank_balances', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 31, '', 'iii. Cash and Cash Equivalents', slaDebitValues('cash_equivalents', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 32, '', 'iv. Bank balance other than (iii) above', slaDebitValues('bank_balances', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaLine(ws, 33, '', 'v. Loan', [0, 0, 0]);
   addSlaLine(ws, 34, '', '(c) Current tax assets (net)', [0, 0, 0]);
   addSlaLine(ws, 35, '', '(d) Other Current Assets', slaDebitValues('other_current_assets', totals, comparativeTotalsByPeriod, comparativePeriods));
@@ -195,7 +195,7 @@ function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, com
 }
 
 function addSegmentSheet(workbook, company, period, reportRun) {
-  const ws = workbook.addWorksheet('Segment reoprt');
+  const ws = workbook.addWorksheet('Segment report');
   const metadata = reportMetadata(company, period, reportRun);
   setupResultColumns(ws);
   mergeValue(ws, 'A2:F2', `${metadata.auditStatus.toUpperCase()} ${metadata.reportNature.toUpperCase()} SEGMENT INFORMATION FOR ${periodGroupLabel(period).toUpperCase()} ${displayDate(period.endDate)}`, 'title');

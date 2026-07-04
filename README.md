@@ -32,6 +32,10 @@ Frontend: `http://localhost:5173`
 
 API: `http://localhost:4000`
 
+## Sample Fixtures
+
+The repository includes sample trial balance inputs and expected reports in the `samples/` folder. Use these files to manually validate upload, comparative period selection, and generated workbook contents.
+
 ## Notes
 
 The API defaults to in-memory storage for speed of iteration. To use PostgreSQL:
