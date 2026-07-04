@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Building2, Download, FileSpreadsheet, LayoutDashboard, LogOut, Plus, Settings, Upload, Wand2 } from 'lucide-react';
-import { api, setToken } from './services/api.js';
+import { api, downloadFile, setToken } from './services/api.js';
 import './styles.css';
 
 function App() {
@@ -303,13 +303,23 @@ function MappingTable({ mapping }) {
 
 function ReportGenerator({ company, period, reports, onGenerated }) {
   const [metadata, setMetadata] = useState({ reportType: 'standalone' });
+  const [error, setError] = useState('');
   async function generate() {
     if (!period) return;
+    setError('');
     await api(`/periods/${period.id}/report-runs`, {
       method: 'POST',
       body: JSON.stringify({ reportType: metadata.reportType, metadata })
     });
     onGenerated();
+  }
+  async function downloadReport(report) {
+    setError('');
+    try {
+      await downloadFile(`/report-runs/${report.id}/download`, report.fileName);
+    } catch (err) {
+      setError(err.message);
+    }
   }
   return (
     <Panel title="Report Generation and History" actions={<button className="primary" onClick={generate} disabled={!company || !period}><Wand2 size={16} /> Generate Excel</button>}>
@@ -321,6 +331,7 @@ function ReportGenerator({ company, period, reports, onGenerated }) {
         </select>
         <span className="muted">Exports are allowed even when unmapped ledgers exist. They are listed in the workbook.</span>
       </div>
+      {error && <p className="inline-error">{error}</p>}
       <div className="table-wrap">
         <table>
           <thead><tr><th>Report</th><th>Status</th><th>Generated</th><th>Action</th></tr></thead>
@@ -330,7 +341,7 @@ function ReportGenerator({ company, period, reports, onGenerated }) {
                 <td>{report.fileName || `${report.reportType} report`}</td>
                 <td><span className="badge ok">{report.status}</span></td>
                 <td>{new Date(report.createdAt).toLocaleString()}</td>
-                <td><a className="download" href={`http://localhost:4000/report-runs/${report.id}/download`}><Download size={16} /> Download</a></td>
+                <td><button className="download" onClick={() => downloadReport(report)}><Download size={16} /> Download</button></td>
               </tr>
             ))}
             {!reports.length && <tr><td colSpan="4" className="empty">No generated reports yet.</td></tr>}
@@ -370,4 +381,3 @@ function formatMoney(value) {
 }
 
 createRoot(document.getElementById('root')).render(<App />);
-

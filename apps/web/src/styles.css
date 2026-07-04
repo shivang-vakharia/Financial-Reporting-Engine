@@ -380,8 +380,18 @@ tbody tr:nth-child(even) {
   align-items: center;
   gap: 6px;
   color: var(--secondary);
+  border: 0;
+  background: transparent;
   text-decoration: none;
   font-weight: 600;
+  padding: 0;
+}
+
+.inline-error {
+  margin: 0;
+  padding: 0 16px 12px;
+  color: var(--danger);
+  font-size: 13px;
 }
 
 .auth-page {
@@ -457,4 +467,3 @@ tbody tr:nth-child(even) {
     padding: 16px;
   }
 }
-
