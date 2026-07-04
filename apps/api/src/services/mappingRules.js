@@ -28,16 +28,16 @@ export const mappingRules = [
   rule('capital|share capital|equity share', 'equity_share_capital'),
   rule('reserve|surplus|retained earnings|other equity', 'other_equity'),
   rule('secured loan|unsecured loan|borrowings|loan liability|bank od|cash credit', 'borrowings_current'),
-  rule('creditor|trade payable|sundry creditor|payable', 'trade_payables'),
+  rule('creditor|creditors|trade payable|trade payables|sundry creditor|sundry creditors|payable|payables', 'trade_payables'),
   rule('duties|tax payable|gst payable|tds payable|current liabilities|booking|advance from customer', 'other_current_liabilities'),
-  rule('fixed asset|plant|machinery|equipment|vehicle|furniture|computer|printer|mobile|air conditioner', 'ppe'),
+  rule('fixed asset|fixed assets|plant|machinery|equipment|vehicle|furniture|computer|printer|mobile|air conditioner', 'ppe'),
   rule('investment|fd|deposit', 'investments'),
   rule('stock|inventory|work in progress|wip|opening stock|closing stock', 'inventories'),
-  rule('debtor|receivable|sundry debtor', 'trade_receivables'),
+  rule('debtor|debtors|receivable|receivables|sundry debtor|sundry debtors', 'trade_receivables'),
   rule('cash in hand|cash-in-hand', 'cash_equivalents'),
-  rule('bank account|bank balance|current account|savings account', 'bank_balances'),
+  rule('bank account|bank accounts|bank balance|bank balances|current account|savings account', 'bank_balances'),
   rule('loan and advance|loans advances|advance asset', 'loans_assets'),
-  rule('deposit asset|current asset|prepaid|other asset', 'other_current_assets'),
+  rule('deposit asset|deposits asset|deposits|current asset|current assets|prepaid|other asset|other current asset', 'other_current_assets'),
   rule('sales|revenue|turnover|flat sales|shop sales', 'revenue_operations'),
   rule('interest income|indirect income|other income|discount received', 'other_income'),
   rule('material consumed|raw material|cement purchase|sand purchase|brick purchase|hardware purchase', 'materials_consumed'),
@@ -57,4 +57,3 @@ function rule(pattern, lineId) {
     line
   };
 }
-
