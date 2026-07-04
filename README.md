@@ -34,4 +34,16 @@ API: `http://localhost:4000`
 
 ## Notes
 
-The current API uses in-memory storage for speed of iteration. PostgreSQL migration files are included so persistence can be wired next without changing the frontend workflow.
+The API defaults to in-memory storage for speed of iteration. To use PostgreSQL:
+
+```bash
+cd apps/api
+copy .env.example .env
+```
+
+Set `STORAGE_DRIVER=postgres` and update `DATABASE_URL`, then run:
+
+```bash
+npm run migrate -w apps/api
+npm run dev
+```

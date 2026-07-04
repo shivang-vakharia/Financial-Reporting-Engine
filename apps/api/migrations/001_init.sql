@@ -56,10 +56,12 @@ CREATE TABLE ledger_entries (
 );
 
 CREATE TABLE ledger_mapping_results (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id text PRIMARY KEY,
   upload_id uuid NOT NULL REFERENCES trial_balance_uploads(id),
   period_id uuid NOT NULL REFERENCES reporting_periods(id),
   ledger_entry_id uuid NOT NULL REFERENCES ledger_entries(id),
+  raw_name text,
+  net_amount numeric(18,2) NOT NULL DEFAULT 0,
   status text NOT NULL CHECK (status IN ('mapped', 'unmapped')),
   schedule_line_id text,
   schedule_label text,
@@ -83,4 +85,3 @@ CREATE TABLE report_runs (
   created_at timestamptz NOT NULL DEFAULT now(),
   completed_at timestamptz
 );
-
