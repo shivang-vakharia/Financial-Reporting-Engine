@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-app.onrender.com/api/:path*"
+      "destination": "VITE_API_URL/api/:path*"
     }
   ],
   "redirects": [
