@@ -1,6 +1,9 @@
 let token = '';
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
+console.log("API URL:", apiBaseUrl);
+console.log(import.meta.env);
+
 export function setToken(value) {
   token = value || '';
 }
