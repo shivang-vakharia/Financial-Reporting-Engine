@@ -211,6 +211,25 @@ button:disabled {
   gap: 12px;
 }
 
+.panel-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: #fff4f3;
+}
+
+.settings-block {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border-top: 1px solid var(--outline);
+}
+
 .panel h2 {
   margin: 0;
   font-size: 16px;

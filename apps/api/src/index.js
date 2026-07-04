@@ -12,6 +12,7 @@ import { createRepository } from './repositories/repository.js';
 import { parseTrialBalance } from './services/trialBalanceParser.js';
 import { mapLedgers } from './services/mappingEngine.js';
 import { generateReportWorkbook } from './services/reportGenerator.js';
+import { scheduleLines } from './services/mappingRules.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -201,6 +202,48 @@ app.get('/periods/:periodId/mapping-results', requireAuth, async (req, res) => {
   if (!period) return;
   const mappings = await repository.listMappingsByPeriod(period.id);
   res.json({ mappings, summary: summarizeMappings(mappings) });
+});
+
+app.get('/schedule-lines', requireAuth, (_req, res) => {
+  res.json(scheduleLines);
+});
+
+app.patch('/periods/:periodId/mapping-results/:mappingId', requireAuth, async (req, res) => {
+  const context = await findPeriod(req, res);
+  const period = context?.period;
+  if (!period) return;
+  const mapping = await repository.getMappingById(req.params.mappingId);
+  if (!mapping || mapping.periodId !== period.id) {
+    return res.status(404).json({ error: 'Mapping result not found for this period.' });
+  }
+  const { scheduleLineId } = req.body;
+  const scheduleLine = scheduleLines.find((line) => line.id === scheduleLineId);
+  if (!scheduleLine) {
+    return res.status(400).json({ error: 'Valid schedule line selection is required.' });
+  }
+  const updated = await repository.updateMapping(mapping.id, {
+    status: 'mapped',
+    scheduleLineId: scheduleLine.id,
+    scheduleLabel: scheduleLine.label,
+    statement: scheduleLine.statement,
+    section: scheduleLine.section,
+    xbrlElement: scheduleLine.xbrl,
+    mappingSource: 'manual',
+    confidenceLabel: 'manual'
+  });
+  res.json(updated);
+});
+
+app.delete('/companies/:companyId', requireAuth, async (req, res) => {
+  const deleted = await repository.deleteCompany(req.params.companyId, req.user.sub);
+  if (!deleted) return res.status(404).json({ error: 'Company not found.' });
+  res.status(204).end();
+});
+
+app.get('/companies/:companyId/report-runs', requireAuth, async (req, res) => {
+  const company = await findCompany(req, res);
+  if (!company) return;
+  res.json(await repository.listReportRunsForCompany(company.id));
 });
 
 app.post('/periods/:periodId/report-runs', requireAuth, async (req, res) => {
