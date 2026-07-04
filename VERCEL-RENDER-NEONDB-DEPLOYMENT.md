@@ -108,11 +108,11 @@ ORDER BY table_name;
 
 You should see:
 - companies
-- reporting_periods
-- trial_balances
 - ledger_entries
 - mapping_results
 - report_runs
+- reporting_periods
+- trial_balances
 
 ---
 

@@ -1,5 +1,6 @@
 let token = '';
-const apiBaseUrl = 'http://localhost:4000';
+//const apiBaseUrl = 'http://localhost:4000';
+const apiBaseUrl = 'VITE_API_URL';
 
 export function setToken(value) {
   token = value || '';
