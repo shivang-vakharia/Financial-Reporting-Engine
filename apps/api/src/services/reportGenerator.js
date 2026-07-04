@@ -2,7 +2,7 @@ import ExcelJS from 'exceljs';
 
 const MONEY_FORMAT = '#,##0.00;[Red](#,##0.00);-';
 
-export async function generateReportWorkbook({ company, period, reportRun, ledgers, mappings, outputPath, comparativePeriods }) {
+export async function generateReportWorkbook({ company, period, reportRun, ledgers, mappings, outputPath, comparativePeriods = [], comparativeMappings = [] }) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Financial Reporting Engine';
   workbook.created = new Date();
@@ -10,9 +10,10 @@ export async function generateReportWorkbook({ company, period, reportRun, ledge
   const mapped = mappings.filter((item) => item.status === 'mapped');
   const unmapped = mappings.filter((item) => item.status === 'unmapped');
   const totals = aggregate(mapped);
+  const comparativeTotalsByPeriod = aggregateByPeriod(comparativeMappings.filter((item) => item.status === 'mapped'));
 
-  addResultSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods);
-  addSlaSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods);
+  addResultSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods, comparativeTotalsByPeriod);
+  addSlaSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods, comparativeTotalsByPeriod);
   addSegmentSheet(workbook, company, period, reportRun);
   addCashFlow(workbook, company, period, reportRun, totals);
   addChangesInEquity(workbook, company, period, reportRun, totals);
@@ -23,7 +24,7 @@ export async function generateReportWorkbook({ company, period, reportRun, ledge
   await workbook.xlsx.writeFile(outputPath);
 }
 
-function addResultSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods) {
+function addResultSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods, comparativeTotalsByPeriod) {
   const ws = workbook.addWorksheet('Result');
   const metadata = reportMetadata(company, period, reportRun);
   setupResultColumns(ws);
@@ -44,22 +45,22 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
 
   const periods = buildDisplayPeriods(period, comparativePeriods);
   setRow(ws, 8, ['', '', periods[0].end, periods[1].end, periods[2].end, periods[0].end, periods[2].end, periods[3].end]);
-  setRow(ws, 9, ['A', 'Date of start of reporting period ', periods[0].start, periods[1].start, periods[2].start, periods[0].start, periods[2].start, periods[3].start]);
+  setRow(ws, 9, ['A', 'Date of start of reporting period', periods[0].start, periods[1].start, periods[2].start, periods[0].start, periods[2].start, periods[3].start]);
   setRow(ws, 10, ['B', 'Date of end of reporting period', { formula: 'C8' }, { formula: 'D8' }, { formula: 'E8' }, { formula: 'F8' }, { formula: 'G8' }, { formula: 'H8' }]);
   setRow(ws, 11, ['C', 'Whether results are audited or unaudited', metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus, metadata.auditStatus]);
   setRow(ws, 12, ['D', 'Nature of report standalone or consolidated', metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature, metadata.reportNature]);
 
-  const revenue = credit(totals.revenue_operations);
-  const otherIncome = credit(totals.other_income);
+  const revenue = resultCreditValues('revenue_operations', totals, comparativeTotalsByPeriod, comparativePeriods);
+  const otherIncome = resultCreditValues('other_income', totals, comparativeTotalsByPeriod, comparativePeriods);
   const expenses = {
-    materials: debit(totals.materials_consumed),
-    purchases: debit(totals.stock_trade_purchase),
-    employees: debit(totals.employee_benefits),
-    finance: debit(totals.finance_costs),
-    depreciation: debit(totals.depreciation),
-    other: debit(totals.other_expenses)
+    materials: resultDebitValues('materials_consumed', totals, comparativeTotalsByPeriod, comparativePeriods),
+    purchases: resultDebitValues('stock_trade_purchase', totals, comparativeTotalsByPeriod, comparativePeriods),
+    employees: resultDebitValues('employee_benefits', totals, comparativeTotalsByPeriod, comparativePeriods),
+    finance: resultDebitValues('finance_costs', totals, comparativeTotalsByPeriod, comparativePeriods),
+    depreciation: resultDebitValues('depreciation', totals, comparativeTotalsByPeriod, comparativePeriods),
+    other: resultDebitValues('other_expenses', totals, comparativeTotalsByPeriod, comparativePeriods)
   };
-  const tax = debit(totals.tax_expense);
+  const tax = resultDebitValues('tax_expense', totals, comparativeTotalsByPeriod, comparativePeriods);
 
   addResultLine(ws, 13, 'I', 'Revenue From Operations', revenue);
   addResultLine(ws, 14, 'II', 'Other Income', otherIncome);
@@ -67,7 +68,7 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
   addResultLine(ws, 16, 'IV', 'Expenses', '');
   addResultLine(ws, 17, '(a)', 'Cost of materials consumed', expenses.materials);
   addResultLine(ws, 18, '(b)', 'Purchases of stock-in-trade', expenses.purchases);
-  addResultLine(ws, 19, '(c)', 'Changes in inventories of finished goods, work-in-progress and stock-in-trade', 0);
+  addResultLine(ws, 19, '(c)', 'Changes in inventories of finished goods, work-in-progress and stock-in-trade', [0, 0, 0, 0, 0, 0]);
   addResultLine(ws, 20, '(d)', 'Employee benefit expense ', expenses.employees);
   addResultLine(ws, 21, '(e)', 'Finance Costs', expenses.finance);
   addResultLine(ws, 22, '(f)', 'Depreciation and amortisation expense', expenses.depreciation);
@@ -75,15 +76,15 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
   addResultLine(ws, 24, '(h)', '(Disclosed each and every item that is being included in Other Expenses and is more than 10% of the Total Expense)', '');
   addFormulaLine(ws, 25, '', 'Total expenses (IV)', 'SUM(C17:C24)');
   addFormulaLine(ws, 26, 'V', 'Profit/(loss) before exceptional and extraordinary items and tax (III-IV)', 'C15-C25');
-  addResultLine(ws, 27, 'VI', 'Exceptional items ', 0);
+  addResultLine(ws, 27, 'VI', 'Exceptional items ', [0, 0, 0, 0, 0, 0]);
   addFormulaLine(ws, 28, 'VII', 'Profit before extraordinary items and tax (V - VI)', 'C26-C27');
-  addResultLine(ws, 29, 'VIII', 'Extraordinary items', 0);
+  addResultLine(ws, 29, 'VIII', 'Extraordinary items', [0, 0, 0, 0, 0, 0]);
   addFormulaLine(ws, 30, 'IX', 'Profit before tax (VII- VIII)', 'C28-C29');
   addResultLine(ws, 31, 'X', 'Tax Expense', '');
   addResultLine(ws, 32, '(a)', 'Current Tax ', tax);
-  addResultLine(ws, 33, '(b)', '(Less):- MAT Credit ', 0);
-  addResultLine(ws, 34, '(c)', 'Current Tax Expense Relating to Prior years', 0);
-  addResultLine(ws, 35, '(d)', 'Deferred Tax (Asset)/Liabilities', 0);
+  addResultLine(ws, 33, '(b)', '(Less):- MAT Credit ', [0, 0, 0, 0, 0, 0]);
+  addResultLine(ws, 34, '(c)', 'Current Tax Expense Relating to Prior years', [0, 0, 0, 0, 0, 0]);
+  addResultLine(ws, 35, '(d)', 'Deferred Tax (Asset)/Liabilities', [0, 0, 0, 0, 0, 0]);
   addFormulaLine(ws, 36, 'XI', 'Profit (Loss) for the period from continuing operations (IX-X)', 'C30-C32-C33-C34-C35');
   addResultLine(ws, 37, 'XII', 'Profit/(loss) from discontinued operations before tax', 0);
   addResultLine(ws, 38, 'XIII', 'Tax expenses of discontinued operations', 0);
@@ -93,10 +94,10 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
   addResultLine(ws, 42, 'XVII', 'Profit (Loss) of Minority Interest', 0);
   addFormulaLine(ws, 43, 'XVIII', 'Net Profit (Loss) for the period (XV+XVI-XVII)', 'C40+C41-C42');
   addResultLine(ws, 44, 'XIX', 'Details of equity share capital', '');
-  addResultLine(ws, 45, '', 'Paid-up equity share capital', numberValue(metadata.paidUpCapital));
+  addResultLine(ws, 45, '', 'Paid-up equity share capital', [numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital), numberValue(metadata.paidUpCapital)]);
   setFormulaAcross(ws, 46, ['', 'Face value of equity share capital (Per Share)', metadata.faceValue || 'Not specified']);
   addResultLine(ws, 47, 'XX', 'Details of Debt Securities', '');
-  addResultLine(ws, 48, '', 'Reserves excluding Revaluaton Reserve', credit(totals.other_equity));
+  addResultLine(ws, 48, '', 'Reserves excluding Revaluation Reserve', resultCreditValues('other_equity', totals, comparativeTotalsByPeriod, comparativePeriods));
   addResultLine(ws, 49, 'XXI', 'Earnings per share', '');
   setFormulaAcross(ws, 50, ['', 'Earnings per share (not annualised for half year / Period ended)', '']);
   addFormulaLine(ws, 51, '', 'Basic earnings (loss) per share from continuing and discotinued operations', 'IF(C45=0,0,C43/(C45/10))');
@@ -117,7 +118,7 @@ function addResultSheet(workbook, company, period, reportRun, totals, unmapped, 
   formatResultSheet(ws);
 }
 
-function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods) {
+function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, comparativePeriods, comparativeTotalsByPeriod) {
   const ws = workbook.addWorksheet('SLA');
   setupSlaColumns(ws);
   const metadata = reportMetadata(company, period, reportRun);
@@ -133,58 +134,58 @@ function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, com
 
   addSlaLine(ws, 9, 'A', 'ASSETS', '');
   addSlaLine(ws, 10, '1', 'Non-current assets', '');
-  addSlaLine(ws, 11, '', '(a)  Property, Plant and Equipment', debit(totals.ppe));
-  addSlaLine(ws, 12, '', '(b)  Capital Work-In-Progress', 0);
-  addSlaLine(ws, 13, '', '(c)  Investment Properties', 0);
-  addSlaLine(ws, 14, '', '(d) Goodwill', 0);
-  addSlaLine(ws, 15, '', '(e) Other Intangible Assets', 0);
-  addSlaLine(ws, 16, '', '(f) Intangible Assets under Development', 0);
+  addSlaLine(ws, 11, '', '(a)  Property, Plant and Equipment', slaDebitValues('ppe', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 12, '', '(b)  Capital Work-In-Progress', [0, 0, 0]);
+  addSlaLine(ws, 13, '', '(c)  Investment Properties', [0, 0, 0]);
+  addSlaLine(ws, 14, '', '(d) Goodwill', [0, 0, 0]);
+  addSlaLine(ws, 15, '', '(e) Other Intangible Assets', [0, 0, 0]);
+  addSlaLine(ws, 16, '', '(f) Intangible Assets under Development', [0, 0, 0]);
   addSlaLine(ws, 17, '', '(g) Financial Assets', '');
-  addSlaLine(ws, 18, '', 'i. Investments', debit(totals.investments));
-  addSlaLine(ws, 19, '', 'ii. Trade Receivables', 0);
-  addSlaLine(ws, 20, '', 'iii. Loan', debit(totals.loans_assets));
-  addSlaLine(ws, 21, '', 'iv. Other Financial Assets', 0);
-  addSlaLine(ws, 22, '', '(h) Deferred tax Assets (net)', 0);
-  addSlaLine(ws, 23, '', '(i) Other Non-Current Assets', 0);
+  addSlaLine(ws, 18, '', 'i. Investments', slaDebitValues('investments', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 19, '', 'ii. Trade Receivables (Non-current)', [0, 0, 0]);
+  addSlaLine(ws, 20, '', 'iii. Loan', slaDebitValues('loans_assets', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 21, '', 'iv. Other Financial Assets', [0, 0, 0]);
+  addSlaLine(ws, 22, '', '(h) Deferred tax Assets (net)', [0, 0, 0]);
+  addSlaLine(ws, 23, '', '(i) Other Non-Current Assets', [0, 0, 0]);
   addSlaFormula(ws, 24, '', 'Total Non-Current Assets', 'SUM(C11:C23)');
   addSlaLine(ws, 26, '2', 'Current assets', '');
-  addSlaLine(ws, 27, '', '(a) Inventories', debit(totals.inventories));
+  addSlaLine(ws, 27, '', '(a) Inventories', slaDebitValues('inventories', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaLine(ws, 28, '', '(b) Financial Assets', '');
-  addSlaLine(ws, 29, '', 'i. Investments', 0);
-  addSlaLine(ws, 30, '', 'ii. Trade Receivables', debit(totals.trade_receivables));
-  addSlaLine(ws, 31, '', 'iii. Cash and cash Equivalents', debit(totals.cash_equivalents));
-  addSlaLine(ws, 32, '', 'iv. Bank balance other than(iii) above', debit(totals.bank_balances));
-  addSlaLine(ws, 33, '', 'v. Loan', 0);
-  addSlaLine(ws, 34, '', '(c) Current tax assets (net)', 0);
-  addSlaLine(ws, 35, '', '(d) Other Current Assets', debit(totals.other_current_assets));
+  addSlaLine(ws, 29, '', 'i. Investments', [0, 0, 0]);
+  addSlaLine(ws, 30, '', 'ii. Trade Receivables', slaDebitValues('trade_receivables', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 31, '', 'iii. Cash and Cash Equivalents', slaDebitValues('cash_equivalents', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 32, '', 'iv. Bank balance other than (iii) above', slaDebitValues('bank_balances', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 33, '', 'v. Loan', [0, 0, 0]);
+  addSlaLine(ws, 34, '', '(c) Current tax assets (net)', [0, 0, 0]);
+  addSlaLine(ws, 35, '', '(d) Other Current Assets', slaDebitValues('other_current_assets', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaFormula(ws, 36, '', 'Total Current Assets', 'SUM(C27:C35)');
   addSlaFormula(ws, 37, '', 'Total Assets(1+2)', 'C24+C36');
 
   addSlaLine(ws, 39, 'B', 'EQUITY AND LIABILITIES', '');
   addSlaLine(ws, 40, '', 'Equity', '');
-  addSlaLine(ws, 41, '', '(a) Equity Share Capital', credit(totals.equity_share_capital));
-  addSlaLine(ws, 42, '', '(b) Other equity', credit(totals.other_equity));
+  addSlaLine(ws, 41, '', '(a) Equity Share Capital', slaCreditValues('equity_share_capital', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 42, '', '(b) Other equity', slaCreditValues('other_equity', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaFormula(ws, 43, '', 'Total Equity', 'SUM(C41:C42)');
   addSlaLine(ws, 45, '', 'Liabilities', '');
   addSlaLine(ws, 46, '', 'Non Current liabilities', '');
   addSlaLine(ws, 47, '', '(a) Financial liabilities', '');
-  addSlaLine(ws, 48, '', 'i. Borrowings', credit(totals.borrowings_non_current));
-  addSlaLine(ws, 49, '', 'ii. Trade Payables', 0);
-  addSlaLine(ws, 50, '', 'iii. Other Financial Liabilities', 0);
-  addSlaLine(ws, 51, '', '(b) Provision', 0);
-  addSlaLine(ws, 52, '', '(c) Deferred tax liabilities (net)', 0);
-  addSlaLine(ws, 53, '', '(d) Other Non-Current liabilities', 0);
+  addSlaLine(ws, 48, '', 'i. Borrowings', slaCreditValues('borrowings_non_current', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 49, '', 'ii. Trade Payables', [0, 0, 0]);
+  addSlaLine(ws, 50, '', 'iii. Other Financial Liabilities', [0, 0, 0]);
+  addSlaLine(ws, 51, '', '(b) Provision', [0, 0, 0]);
+  addSlaLine(ws, 52, '', '(c) Deferred tax liabilities (net)', [0, 0, 0]);
+  addSlaLine(ws, 53, '', '(d) Other Non-Current liabilities', [0, 0, 0]);
   addSlaFormula(ws, 54, '', 'Total Non-Current liabilities', 'SUM(C47:C53)');
   addSlaLine(ws, 56, '', 'Current Liabilities', '');
   addSlaLine(ws, 57, '', '(a) Financial liabilities', '');
-  addSlaLine(ws, 58, '', 'i. Borrowings', credit(totals.borrowings_current));
+  addSlaLine(ws, 58, '', 'i. Borrowings', slaCreditValues('borrowings_current', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaLine(ws, 59, '', 'ii. Financial payable', '');
-  addSlaLine(ws, 60, '', 'a. Total outstanding Dues of Micro enterprises and small enterprises', 0);
-  addSlaLine(ws, 61, '', 'b. Total outstanding Dues of Creditors other than Micro enterprise and small enterprises', credit(totals.trade_payables));
-  addSlaLine(ws, 62, '', 'iii. Other Financial liabilities', 0);
-  addSlaLine(ws, 63, '', '(b) Provisions', 0);
-  addSlaLine(ws, 64, '', '(c) Current tax liabilities', 0);
-  addSlaLine(ws, 65, '', '(d) Other Liabilities', credit(totals.other_current_liabilities));
+  addSlaLine(ws, 60, '', 'a. Total outstanding Dues of Micro enterprises and small enterprises', [0, 0, 0]);
+  addSlaLine(ws, 61, '', 'b. Total outstanding Dues of Creditors other than Micro enterprise and small enterprises', slaCreditValues('trade_payables', totals, comparativeTotalsByPeriod, comparativePeriods));
+  addSlaLine(ws, 62, '', 'iii. Other Financial liabilities', [0, 0, 0]);
+  addSlaLine(ws, 63, '', '(b) Provisions', [0, 0, 0]);
+  addSlaLine(ws, 64, '', '(c) Current tax liabilities', [0, 0, 0]);
+  addSlaLine(ws, 65, '', '(d) Other Liabilities', slaCreditValues('other_current_liabilities', totals, comparativeTotalsByPeriod, comparativePeriods));
   addSlaFormula(ws, 66, '', 'Total Current liabilities', 'SUM(C57:C65)');
   addSlaFormula(ws, 67, '', 'Total Equity and liabilities', 'C43+C54+C66');
   addSlaFormula(ws, 68, '', 'Check', 'C67-C37');
@@ -194,7 +195,7 @@ function addSlaSheet(workbook, company, period, reportRun, totals, unmapped, com
 }
 
 function addSegmentSheet(workbook, company, period, reportRun) {
-  const ws = workbook.addWorksheet('Segment reoprt');
+  const ws = workbook.addWorksheet('Segment report');
   const metadata = reportMetadata(company, period, reportRun);
   setupResultColumns(ws);
   mergeValue(ws, 'A2:F2', `${metadata.auditStatus.toUpperCase()} ${metadata.reportNature.toUpperCase()} SEGMENT INFORMATION FOR ${periodGroupLabel(period).toUpperCase()} ${displayDate(period.endDate)}`, 'title');
@@ -285,7 +286,13 @@ function addUnmapped(workbook, unmapped) {
 }
 
 function addResultLine(ws, rowNumber, code, label, amount) {
-  setFormulaAcross(ws, rowNumber, [code, label, amount]);
+  const row = ws.getRow(rowNumber);
+  row.getCell(1).value = code;
+  row.getCell(2).value = label;
+  const values = Array.isArray(amount) ? amount : [amount, '', '', '', '', ''];
+  ['C', 'D', 'E', 'F', 'G', 'H'].forEach((col, index) => {
+    row.getCell(col).value = values[index] !== undefined ? values[index] : '';
+  });
 }
 
 function addFormulaLine(ws, rowNumber, code, label, formula) {
@@ -311,7 +318,10 @@ function addSlaLine(ws, rowNumber, code, label, amount) {
   const row = ws.getRow(rowNumber);
   row.getCell(1).value = code;
   row.getCell(2).value = label;
-  row.getCell(3).value = amount;
+  const values = Array.isArray(amount) ? amount : [amount, '', ''];
+  ['C', 'D', 'E'].forEach((col, index) => {
+    row.getCell(col).value = values[index] !== undefined ? values[index] : '';
+  });
 }
 
 function addSlaFormula(ws, rowNumber, code, label, formula) {
@@ -498,6 +508,47 @@ function periodLabel(period) {
   if (type === 'annual') return 'year';
   if (type === 'monthly') return 'month';
   return 'period';
+}
+
+function aggregateByPeriod(mapped) {
+  return mapped.reduce((acc, item) => {
+    if (!item.periodId) return acc;
+    const periodTotals = acc[item.periodId] || {};
+    periodTotals[item.scheduleLineId] = (periodTotals[item.scheduleLineId] || 0) + item.netAmount;
+    acc[item.periodId] = periodTotals;
+    return acc;
+  }, {});
+}
+
+function resultLineValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  const current = currentTotals[lineId] || 0;
+  const previous = comparativeTotalsByPeriod[comparativePeriods[0]?.id]?.[lineId] ?? current;
+  const prior = comparativeTotalsByPeriod[comparativePeriods[1]?.id]?.[lineId] ?? previous;
+  const year = comparativeTotalsByPeriod[comparativePeriods[2]?.id]?.[lineId] ?? prior;
+  return [current, previous, prior, current, prior, year];
+}
+
+function resultDebitValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  return resultLineValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods).map(debit);
+}
+
+function resultCreditValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  return resultLineValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods).map(credit);
+}
+
+function slaValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  const current = currentTotals[lineId] || 0;
+  const previous = comparativeTotalsByPeriod[comparativePeriods[0]?.id]?.[lineId] ?? current;
+  const prior = comparativeTotalsByPeriod[comparativePeriods[1]?.id]?.[lineId] ?? previous;
+  return [current, previous, prior];
+}
+
+function slaDebitValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  return slaValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods).map(debit);
+}
+
+function slaCreditValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods) {
+  return slaValues(lineId, currentTotals, comparativeTotalsByPeriod, comparativePeriods).map(credit);
 }
 
 function aggregate(mapped) {

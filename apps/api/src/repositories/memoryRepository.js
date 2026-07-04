@@ -67,6 +67,14 @@ export function createMemoryRepository() {
     async listMappingsByPeriod(periodId) {
       return store.mappings.filter((mapping) => mapping.periodId === periodId);
     },
+    async listMappingsByPeriodIds(periodIds) {
+      if (!periodIds || !periodIds.length) return [];
+      return store.mappings.filter((mapping) => periodIds.includes(mapping.periodId));
+    },
+    async listPeriodsByIds(companyId, periodIds) {
+      if (!periodIds || !periodIds.length) return [];
+      return store.periods.filter((period) => period.companyId === companyId && periodIds.includes(period.id));
+    },
     async createReportRun(reportRun) {
       store.reportRuns.push(reportRun);
       return reportRun;
@@ -88,7 +96,10 @@ export function createMemoryRepository() {
       return company ? run : null;
     },
     async listComparativePeriods(companyId, currentPeriodId) {
-      return store.periods.filter((period) => period.companyId === companyId && period.id !== currentPeriodId).slice(-3);
+      return store.periods
+        .filter((period) => period.companyId === companyId && period.id !== currentPeriodId)
+        .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+        .slice(0, 3);
     }
   };
 }
