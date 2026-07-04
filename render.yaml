@@ -1,0 +1,40 @@
+runtime: node
+env: production
+
+services:
+  - type: web
+    name: fre-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build:api || true
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fre-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false  # Set via UI
+      - key: WEB_ORIGIN
+        value: https://your-app.vercel.app
+      - key: STORAGE_DRIVER
+        value: postgresql
+      - key: LOG_LEVEL
+        value: info
+
+  - type: pserv
+    name: fre-postgres
+    runtime: postgres
+    plan: free
+    ipAllowList: []
+    initializer:
+      type: sql
+      source:
+        type: github
+        repo: shivang-vakharia/Financial-Reporting-Engine
+        branch: main
+        path: migrations/init.sql
