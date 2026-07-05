@@ -32,7 +32,7 @@ app.use(helmet());
 
 // Rate limiting - strict for auth endpoints, moderate for API
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 50 * 60 * 1000,
   max: 5,
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,

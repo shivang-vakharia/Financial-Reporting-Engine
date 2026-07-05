@@ -5,11 +5,15 @@ export function createPostgresRepository(pool) {
       return result.rows[0] ? userFromRow(result.rows[0]) : null;
     },
     async createUser(user) {
+      console.log("createUser called with:", user);
+      
       const result = await pool.query(
         `INSERT INTO users (id, name, email, password_hash, created_at)
          VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [user.id, user.name, user.email, user.passwordHash, user.createdAt]
       );
+
+      console.log("Inserted rows:", result.rowCount);
       return userFromRow(result.rows[0]);
     },
     async listCompanies(ownerId) {
