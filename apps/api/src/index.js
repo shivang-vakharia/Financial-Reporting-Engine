@@ -179,8 +179,16 @@ app.post('/companies/:companyId/periods', requireAuth, async (req, res) => {
 });
 
 app.post('/periods/:periodId/uploads', requireAuth, upload.single('trialBalance'), async (req, res) => {
+
+  console.log("Period ID from URL:", req.params.periodId);
+  console.log("Authenticated user:", req.user.sub);
+  
   const context = await findPeriod(req, res);
+  console.log("Context:", context);
+
   const period = context?.period;
+  console.log("Resolved period:", period);
+
   if (!period) return;
   if (!req.file) return res.status(400).json({ error: 'Trial balance Excel file is required.' });
 
