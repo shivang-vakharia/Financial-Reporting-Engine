@@ -1,6 +1,18 @@
   import React, { useEffect, useMemo, useState } from 'react';
   import { createRoot } from 'react-dom/client';
-  import { Building2, Download, FileSpreadsheet, LayoutDashboard, LogOut, Plus, Settings, Upload, Wand2 } from 'lucide-react';
+  import {
+  Building2,
+  Download,
+  FileSpreadsheet,
+  LayoutDashboard,
+  LogOut,
+  Plus,
+  Settings,
+  Upload,
+  Wand2,
+  Loader2,
+  CheckCircle2
+} from "lucide-react";
   import { api, downloadFile, setToken } from './services/api.js';
   import './styles.css';
 
@@ -342,66 +354,203 @@
 
   function CreateCompany({ onCreated }) {
     const [open, setOpen] = useState(false);
-    const [form, setForm] = useState({ name: '', cin: '', registeredOffice: '' });
+
+    const [form, setForm] = useState({
+      name: "",
+      cin: "",
+      registeredOffice: "",
+    });
+
+    const { loading, success, run } = useAsyncStatus();
+
     async function submit(event) {
       event.preventDefault();
-      const company = await api('/companies', { method: 'POST', body: JSON.stringify(form) });
-      setOpen(false);
-      setForm({ name: '', cin: '', registeredOffice: '' });
-      onCreated(company);
+
+      await run(async () => {
+        const company = await api("/companies", {
+          method: "POST",
+          body: JSON.stringify(form),
+        });
+
+        setOpen(false);
+
+        setForm({
+          name: "",
+          cin: "",
+          registeredOffice: "",
+        });
+
+        onCreated(company);
+      });
     }
+
     return open ? (
-      <form className="inline-form" onSubmit={submit}>
-        <input placeholder="Company name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-        <input placeholder="CIN" value={form.cin} onChange={(event) => setForm({ ...form, cin: event.target.value })} />
-        <button className="primary">Save</button>
+      <form
+        className="inline-form"
+        onSubmit={submit}
+      >
+        <input
+          placeholder="Company name"
+          value={form.name}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              name: e.target.value,
+            })
+          }
+        />
+
+        <input
+          placeholder="CIN"
+          value={form.cin}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              cin: e.target.value,
+            })
+          }
+        />
+
+        <AsyncButton
+          loading={loading}
+          success={success}
+          type="submit"
+        >
+          {loading ? "Saving..." : success ? "Saved" : "Save"}
+        </AsyncButton>
       </form>
-    ) : <button className="primary" onClick={() => setOpen(true)}><Plus size={16} /> Add Company</button>;
+    ) : (
+      <button
+        className="primary"
+        onClick={() => setOpen(true)}
+      >
+        <Plus size={16} />
+        Add Company
+      </button>
+    );
   }
 
   function CreatePeriod({ company, onCreated }) {
     const [open, setOpen] = useState(false);
-    const [form, setForm] = useState({ label: 'FY 2025-26 Q1', periodType: 'quarterly', startDate: '2025-04-01', endDate: '2025-06-30' });
+
+    const [form, setForm] = useState({
+      label: "FY 2025-26 Q1",
+      periodType: "quarterly",
+      startDate: "2025-04-01",
+      endDate: "2025-06-30",
+    });
+
+    const { loading, success, run } = useAsyncStatus();
+
     async function submit(event) {
       event.preventDefault();
-      const period = await api(`/companies/${company.id}/periods`, { method: 'POST', body: JSON.stringify(form) });
-      setOpen(false);
-      onCreated(period);
+
+      await run(async () => {
+        const period = await api(
+          `/companies/${company.id}/periods`,
+          {
+            method: "POST",
+            body: JSON.stringify(form),
+          }
+        );
+
+        setOpen(false);
+
+        onCreated(period);
+      });
     }
+
     return open ? (
-      <form className="inline-form" onSubmit={submit}>
-        <input value={form.label} onChange={(event) => setForm({ ...form, label: event.target.value })} />
-        <select value={form.periodType} onChange={(event) => setForm({ ...form, periodType: event.target.value })}>
+      <form
+        className="inline-form"
+        onSubmit={submit}
+      >
+        <input
+          value={form.label}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              label: e.target.value,
+            })
+          }
+        />
+
+        <select
+          value={form.periodType}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              periodType: e.target.value,
+            })
+          }
+        >
           <option value="monthly">Monthly</option>
           <option value="quarterly">Quarterly</option>
           <option value="half_yearly">Half-yearly</option>
           <option value="annual">Annual</option>
         </select>
-        <button className="primary">Save</button>
+
+        <AsyncButton
+          loading={loading}
+          success={success}
+          type="submit"
+        >
+          {loading ? "Saving..." : success ? "Saved" : "Save"}
+        </AsyncButton>
       </form>
-    ) : <button className="secondary" onClick={() => setOpen(true)}><Plus size={16} /> Add Period</button>;
+    ) : (
+      <button
+        className="secondary"
+        onClick={() => setOpen(true)}
+      >
+        <Plus size={16} />
+        Add Period
+      </button>
+    );
   }
 
   function CompanyMetadata({ company, onSaved, onDeleted }) {
     const [form, setForm] = useState({});
+
+    const { loading, success, run } = useAsyncStatus();
     useEffect(() => {
       if (company) setForm({ ...company.metadata, name: company.name, cin: company.cin, registeredOffice: company.registeredOffice });
     }, [company?.id]);
     if (!company) return <Panel title="Company Metadata"><p className="muted">Create a company to begin.</p></Panel>;
     async function save(event) {
       event.preventDefault();
-      await api(`/companies/${company.id}/metadata`, { method: 'PATCH', body: JSON.stringify(form) });
-      onSaved();
+
+      await run(async () => {
+        await api(`/companies/${company.id}/metadata`, {
+          method: "PATCH",
+          body: JSON.stringify(form),
+        });
+
+        onSaved();
+      });
     }
     return (
       <Panel title="Report Metadata" actions={
-        <button type="button" className="danger" onClick={() => onDeleted?.(company.id)}>Delete company</button>
+        <AsyncDeleteButton
+            companyId={company.id}
+            onDeleted={onDeleted}
+        />
       }>
         <form className="metadata-grid" onSubmit={save}>
           {['name', 'cin', 'registeredOffice', 'auditStatus', 'boardMeetingDate', 'paidUpCapital', 'faceValue', 'directorName', 'din', 'place'].map((key) => (
             <Field key={key} label={labelize(key)} value={form[key] || ''} onChange={(value) => setForm({ ...form, [key]: value })} />
           ))}
-          <button className="primary">Save Metadata</button>
+          <AsyncButton
+            loading={loading}
+            success={success}
+            type="submit"
+        >
+            {loading
+                ? "Saving..."
+                : success
+                ? "Saved"
+                : "Save Metadata"}
+        </AsyncButton>
         </form>
       </Panel>
     );
@@ -698,4 +847,118 @@
     return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(value || 0);
   }
 
+  function useAsyncStatus() {
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    async function run(action) {
+      setLoading(true);
+      setSuccess(false);
+
+      try {
+        const result = await action();
+
+        setLoading(false);
+        setSuccess(true);
+
+        setTimeout(() => {
+          setSuccess(false);
+        }, 1500);
+
+        return result;
+      } catch (err) {
+        setLoading(false);
+        throw err;
+      }
+    }
+
+    return {
+      loading,
+      success,
+      run
+    };
+  }
+
+  function LoadingSpinner({ size = 16 }) {
+    return (
+      <Loader2
+        size={size}
+        className="spin"
+      />
+    );
+  }
+
+  function ButtonStatusIcon({ loading, success }) {
+    if (loading) {
+      return <LoadingSpinner size={16} />;
+    }
+
+    if (success) {
+      return (
+        <CheckCircle2
+          size={16}
+          className="success-icon"
+        />
+      );
+    }
+
+    return null;
+  }
+
+  function AsyncButton({
+    loading,
+    success,
+    children,
+    className = "primary",
+    disabled,
+    ...props
+  }) {
+    return (
+      <button
+        {...props}
+        disabled={disabled || loading}
+        className={[
+          className,
+          loading && "button-loading",
+          success && "button-success",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <ButtonStatusIcon
+          loading={loading}
+          success={success}
+        />
+
+        <span>{children}</span>
+      </button>
+    );
+  }
+
+  function AsyncDeleteButton({
+    companyId,
+    onDeleted,
+  }) {
+    const { loading, success, run } =
+      useAsyncStatus();
+
+    return (
+      <AsyncButton
+        className="danger"
+        loading={loading}
+        success={success}
+        onClick={() =>
+          run(async () => {
+            await onDeleted(companyId);
+          })
+        }
+      >
+        {loading
+          ? "Deleting..."
+          : success
+          ? "Deleted"
+          : "Delete Company"}
+      </AsyncButton>
+    );
+  }
   createRoot(document.getElementById('root')).render(<App />);

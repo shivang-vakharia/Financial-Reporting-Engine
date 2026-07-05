@@ -801,3 +801,50 @@ tbody tr:hover {
     opacity:.55;
     cursor:not-allowed;
 }
+
+/* ===========================
+   GLOBAL ASYNC STATES
+=========================== */
+
+.spin {
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-icon {
+  color: var(--ok);
+}
+
+.button-loading {
+  pointer-events: none;
+}
+
+.button-success {
+  border-color: var(--ok);
+}
+
+.button-success .success-icon {
+  animation: pop .2s ease;
+}
+
+@keyframes pop {
+
+  0% {
+    transform: scale(.8);
+    opacity: .6;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
