@@ -409,22 +409,90 @@
 
   function UploadTrialBalance({ period, onUploaded }) {
     const [file, setFile] = useState(null);
-    async function submit(event) {
-      event.preventDefault();
+    const [dragging, setDragging] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
+    async function submit(e) {
+      e.preventDefault();
       if (!period || !file) return;
-      const formData = new FormData();
-      formData.append('trialBalance', file);
-      const result = await api(`/periods/${period.id}/uploads`, { method: 'POST', body: formData, isForm: true });
-      onUploaded(result);
+
+      setUploading(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("trialBalance", file);
+
+        const result = await api(`/periods/${period.id}/uploads`, {
+          method: "POST",
+          body: formData,
+          isForm: true,
+        });
+
+        onUploaded(result);
+        setFile(null);
+      } finally {
+        setUploading(false);
+      }
     }
+
+    function onDrop(e) {
+      e.preventDefault();
+      setDragging(false);
+
+      if (e.dataTransfer.files.length) {
+        setFile(e.dataTransfer.files[0]);
+      }
+    }
+
     return (
       <Panel title="Upload Trial Balance">
         <form className="upload-box" onSubmit={submit}>
-          <Upload />
-          <strong>Upload .xlsx trial balance</strong>
-          <span>{period ? period.label : 'Select or create a reporting period first'}</span>
-          <input type="file" accept=".xlsx,.xls,.xlsm" onChange={(event) => setFile(event.target.files?.[0] || null)} />
-          <button className="primary" disabled={!period || !file}>Parse and Map</button>
+          <div
+            className={`drop-zone ${dragging ? "dragging" : ""}`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDrop}
+          >
+            <Upload size={50} />
+
+            <h3>Drop your Excel file here</h3>
+
+            <p>or</p>
+
+            <label className="upload-btn">
+              Choose File
+              <input
+                type="file"
+                accept=".xlsx,.xls,.xlsm"
+                hidden
+                onChange={(e) => {
+                  if (e.target.files?.length) {
+                    setFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </label>
+
+            {file && (
+              <div className="selected-file">
+                📄 {file.name}
+              </div>
+            )}
+
+            <small>
+              Supported formats: .xlsx, .xls, .xlsm
+            </small>
+          </div>
+
+          <button
+            className="primary upload-submit"
+            disabled={!file || !period || uploading}
+          >
+            {uploading ? "Uploading..." : "Parse & Map"}
+          </button>
         </form>
       </Panel>
     );
