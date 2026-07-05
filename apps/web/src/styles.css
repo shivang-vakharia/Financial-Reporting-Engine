@@ -848,3 +848,117 @@ tbody tr:hover {
     opacity: 1;
   }
 }
+
+/* ==========================================
+   Upload Card v2
+========================================== */
+
+.upload-card{
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+.selected-file-card{
+border:1px solid var(--outline);
+border-radius:6px;
+padding:14px;
+background:var(--surface-lowest);
+}
+
+.selected-file-title{
+font-size:12px;
+font-weight:600;
+margin-bottom:6px;
+color:var(--ok);
+}
+
+.upload-status-card{
+border:1px solid var(--outline);
+border-radius:6px;
+padding:14px;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.status-title{
+font-size:12px;
+font-weight:600;
+}
+
+.status-chip{
+display:inline-flex;
+align-items:center;
+gap:8px;
+width:max-content;
+padding:5px 10px;
+border-radius:4px;
+font-size:12px;
+font-weight:600;
+}
+
+.status-chip.ready{
+background:#f2f4f6;
+}
+
+.status-chip.processing{
+background:#dbe1ff;
+color:#003ea8;
+}
+
+.status-chip.success{
+background:#e6f4ea;
+color:#137333;
+}
+
+.progress-bar{
+height:6px;
+border-radius:999px;
+background:#eef1f4;
+overflow:hidden;
+}
+
+.progress-indeterminate{
+height:100%;
+width:35%;
+background:#316bf3;
+animation:progress-slide 1.2s infinite;
+}
+
+@keyframes progress-slide{
+
+0%{
+transform:translateX(-120%);
+}
+
+100%{
+transform:translateX(350%);
+}
+
+}
+
+.upload-summary{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.upload-summary>div{
+border:1px solid var(--outline);
+padding:12px;
+border-radius:6px;
+background:white;
+}
+
+.upload-summary span{
+display:block;
+font-size:11px;
+text-transform:uppercase;
+color:var(--muted);
+margin-bottom:4px;
+}
+
+.upload-summary strong{
+font-size:20px;
+}
