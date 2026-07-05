@@ -35,19 +35,31 @@
 
     useEffect(() => {
       if (!session?.token) return;
-      setToken(session.token);
-      await refreshCompanies();
-      await refreshScheduleLines();
-      refreshReports(companyId);
+
+      async function initialize() {
+        setToken(session.token);
+
+        const companies = await refreshCompanies();
+        await refreshScheduleLines();
+
+        if (companies.length > 0) {
+          await refreshReports(companies[0].id);
+        } else {
+          setReports([]);
+          setCompanyId("");
+          setPeriodId("");
+        }
+      }
+
+      initialize();
     }, [session?.token]);
 
     useEffect(() => {
+
       console.log("companyId changed:", companyId);
 
       if (!companyId) return;
-
       refreshPeriods(companyId);
-      refreshReports(companyId);
     }, [companyId]);
 
     useEffect(() => {
@@ -60,10 +72,9 @@
     const selectedPeriod = periods.find((item) => item.id === periodId);
 
     async function refreshCompanies() {
+      const data = await api("/companies");
 
       console.log("Companies from API:", data);
-
-      const data = await api("/companies");
 
       setCompanies(data);
 
