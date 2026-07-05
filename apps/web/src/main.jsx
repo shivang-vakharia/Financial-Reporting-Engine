@@ -31,16 +31,21 @@
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
 
+    console.log("companyId state =", companyId);
+
     useEffect(() => {
       if (!session?.token) return;
       setToken(session.token);
-      refreshCompanies();
-      refreshScheduleLines();
+      await refreshCompanies();
+      await refreshScheduleLines();
       refreshReports(companyId);
     }, [session?.token]);
 
     useEffect(() => {
+      console.log("companyId changed:", companyId);
+
       if (!companyId) return;
+
       refreshPeriods(companyId);
       refreshReports(companyId);
     }, [companyId]);
@@ -55,9 +60,24 @@
     const selectedPeriod = periods.find((item) => item.id === periodId);
 
     async function refreshCompanies() {
-      const data = await api('/companies');
+
+      console.log("Companies from API:", data);
+
+      const data = await api("/companies");
+
       setCompanies(data);
-      if (data[0] && !companyId) setCompanyId(data[0].id);
+
+      if (data.length === 0) {
+        setCompanyId("");
+        setPeriodId("");
+        setReports([]);
+        return data;
+      }
+
+      if (!companyId || !data.some(c => c.id === companyId)) {
+        setCompanyId(data[0].id);
+      }
+
       return data;
     }
 
@@ -83,6 +103,9 @@
     }
 
     async function refreshReports(selectedCompanyId) {
+
+      console.log("refreshReports called with:", selectedCompanyId);
+      
       if (selectedCompanyId) {
         setReports(await api(`/companies/${selectedCompanyId}/report-runs`));
         return;

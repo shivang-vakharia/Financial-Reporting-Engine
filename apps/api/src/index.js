@@ -30,7 +30,7 @@ const repository = createRepository();
 // Security middleware
 app.use(helmet());
 
-app.set('trust proxy', true);
+app.set("trust proxy", 1);
 
 // Rate limiting - strict for auth endpoints, moderate for API
 const authLimiter = rateLimit({
