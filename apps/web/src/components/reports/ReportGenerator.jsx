@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { api } from "../services/api";
 import Panel from "../common/Panel"
 import { Download, Wand2 } from 'lucide-react';
+import { downloadFile, setToken } from "../services/api.js";
 
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });
