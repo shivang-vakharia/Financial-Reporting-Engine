@@ -1,4 +1,4 @@
-import ButtonStatusIcon from "./buttonStatusIcon";
+import ButtonStatusIcon from "ButtonStatusIcon";
 
 export default function AsyncButton({
     loading,
