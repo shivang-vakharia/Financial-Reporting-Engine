@@ -165,33 +165,19 @@ export function createPostgresRepository(pool) {
       return result.rows.map(reportRunFromRow);
     },
     async deleteCompany(companyId, ownerId) {
-      const client = await pool.connect();
-      try {
-        await client.query('BEGIN');
-        const companyResult = await client.query('SELECT * FROM companies WHERE id = $1 AND owner_id = $2', [companyId, ownerId]);
-        if (!companyResult.rows[0]) {
-          await client.query('ROLLBACK');
-          return null;
-        }
-        const company = companyFromRow(companyResult.rows[0]);
-        const periodIdsResult = await client.query('SELECT id FROM reporting_periods WHERE company_id = $1', [companyId]);
-        const periodIds = periodIdsResult.rows.map((row) => row.id);
-        if (periodIds.length) {
-          await client.query('DELETE FROM ledger_mapping_results WHERE period_id = ANY($1)', [periodIds]);
-          await client.query('DELETE FROM ledger_entries WHERE period_id = ANY($1)', [periodIds]);
-          await client.query('DELETE FROM trial_balance_uploads WHERE period_id = ANY($1)', [periodIds]);
-          await client.query('DELETE FROM reporting_periods WHERE id = ANY($1)', [periodIds]);
-        }
-        await client.query('DELETE FROM report_runs WHERE company_id = $1', [companyId]);
-        await client.query('DELETE FROM companies WHERE id = $1 AND owner_id = $2', [companyId, ownerId]);
-        await client.query('COMMIT');
-        return company;
-      } catch (error) {
-        await client.query('ROLLBACK');
-        throw error;
-      } finally {
-        client.release();
-      }
+        const result = await pool.query(
+            `
+            DELETE FROM companies
+            WHERE id = $1
+              AND owner_id = $2
+            RETURNING *
+            `,
+            [companyId, ownerId]
+        );
+
+        return result.rows[0]
+            ? companyFromRow(result.rows[0])
+            : null;
     },
     async listPeriodsByIds(companyId, periodIds) {
       if (!periodIds || !periodIds.length) return [];
