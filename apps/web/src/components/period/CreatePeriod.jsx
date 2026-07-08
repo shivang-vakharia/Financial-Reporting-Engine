@@ -1,5 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Plus } from "lucide-react";
 
 export default function CreatePeriod({ company, onCreated }) {
     const [open, setOpen] = useState(false);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 export default function Panel({ title, actions, children }) {
     return ( 
         <section className="panel">

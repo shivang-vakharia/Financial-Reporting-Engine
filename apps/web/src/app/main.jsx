@@ -130,7 +130,8 @@ function App() {
   async function refreshCompanies() {
     const data = await getCompanies();
 
-    console.log("Companies from API:", data);
+    console.log("getCompanies returned:", data);
+    console.log("Is array?", Array.isArray(data));
 
     setCompanies(data);
 
