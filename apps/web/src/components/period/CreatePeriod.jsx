@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { api } from "../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import AsyncButton from "../common/AsyncButton";
+import { Plus } from "lucide-react";
 
 export default function CreatePeriod({ company, onCreated }) {
     const [open, setOpen] = useState(false);
