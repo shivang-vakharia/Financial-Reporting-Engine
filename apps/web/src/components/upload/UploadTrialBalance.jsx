@@ -4,19 +4,8 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import React, { useState, useEffect, useMemo } from "react";
 import { api } from "../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
-import {
-Building2,
-Download,
-FileSpreadsheet,
-LayoutDashboard,
-LogOut,
-Plus,
-Settings,
-Upload,
-Wand2,
-Loader2,
-CheckCircle2
-} from "lucide-react";
+import Panel from "../commom/Panel"
+import { Upload, CheckCircle2 } from "lucide-react";
 
 export default function UploadTrialBalance({ period, onUploaded }) {
     const [file, setFile] = useState(null);

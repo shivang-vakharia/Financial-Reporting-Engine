@@ -1,19 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Panel from "../common/Panel"
 import formatMoney from "../../utils/formatMoney";
-import {
-Building2,
-Download,
-FileSpreadsheet,
-LayoutDashboard,
-LogOut,
-Plus,
-Settings,
-Upload,
-Wand2,
-Loader2,
-CheckCircle2
-} from "lucide-react";
 
 export default function MappingTable({ mapping, scheduleLines, onMappingUpdated }) {
     const [collapsed, setCollapsed] = useState(false);
