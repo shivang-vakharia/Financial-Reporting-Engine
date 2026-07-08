@@ -1,5 +1,6 @@
 import React from "react";
 import AuthScreen from "./AuthScreen";
+import { Building2 } from "lucide-react";
 
 export default function LandingPage({ onSignup, onLogin, onSession, showAuth, authMode, onCloseAuth }) {
     return (

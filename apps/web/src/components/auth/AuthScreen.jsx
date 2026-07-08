@@ -1,5 +1,6 @@
 import React from "react";
 import Field from '../common/Field.jsx';
+import { Building2 } from "lucide-react";
 
 export default function AuthScreen({ mode: initialMode, onSession }) {
     const [mode, setMode] = useState(initialMode || 'login');
