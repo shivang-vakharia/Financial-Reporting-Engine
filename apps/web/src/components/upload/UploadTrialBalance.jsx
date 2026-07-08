@@ -4,7 +4,6 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import React, { useState, useEffect, useMemo } from "react";
 import { api } from "../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
-import Panel from "../commom/Panel"
 import { Upload, CheckCircle2 } from "lucide-react";
 
 export default function UploadTrialBalance({ period, onUploaded }) {
