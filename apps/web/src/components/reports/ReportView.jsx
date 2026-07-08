@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from 'react';
+
 export default function ReportsView({ company, reports, onDownload }) {
     return (
       <Panel title="Report History">
