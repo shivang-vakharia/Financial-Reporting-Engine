@@ -59,11 +59,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '2mb' }));
+app.options('*', cors(corsOptions));
 
-// Apply rate limiting to API routes
-app.use('/api/', apiLimiter);
-app.use('/auth/', authLimiter);
+app.use(express.json({ limit: '2mb' }));
 
 const upload = multer({
   dest: uploadDir,

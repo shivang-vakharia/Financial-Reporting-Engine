@@ -1,0 +1,351 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
+  
+import { downloadFile, setToken } from "../components/services/api.js";
+
+import {
+    getCompanies,
+    deleteCompany as deleteCompanyApi,
+} from "../components/services/companyService.js";
+
+import {
+    getPeriods,
+} from "../components/services/periodService.js";
+
+import {
+    getMapping,
+    updateMapping,
+} from "../components/services/mappingService.js";
+
+import {
+    getUploads,
+} from "../components/services/uploadService.js";
+
+import {
+    getReports,
+} from "../components/services/reportService.js";
+
+import {
+    getScheduleLines,
+} from "../components/services/scheduleService.js";
+
+import {
+    saveSession,
+    clearSession,
+} from "../components/services/authService.js";
+import '../styles/styles.css';
+
+import loadSession from '../utils/loadSession.js';
+import formatMoney from '../utils/formatMoney.js';
+import labelize from '../utils/labelize.js';
+import useAsyncStatus from "../hooks/useAsyncStatus";
+import AuthScreen from "../components/auth/AuthScreen.jsx";
+import LandingPage from "../components/auth/LandingPage.jsx";
+import AsyncButton from '../components/common/AsyncButton.jsx';
+import AsyncDeleteButton from "../components/common/AsyncDeleteButton.jsx";
+import Field from "../components/common/Field.jsx";
+import Panel from "../components/common/Panel.jsx";
+import Stat from "../components/common/Stat.jsx";
+import CompanyMetadata from "../components/company/CompanyMetadata.jsx";
+import CreateCompany from "../components/company/CreateCompany.jsx";
+import CreatePeriod from "../components/period/CreatePeriod.jsx";
+import MappingTable from "../components/mapping/MappingTable.jsx";
+import ReportGenerator from '../components/reports/ReportGenerator.jsx';
+import ReportsView from '../components/reports/ReportView.jsx';
+import SettingsView from '../components/settings/SettingsView.jsx';
+import UploadTrialBalance from "../components/upload/UploadTrialBalance.jsx";
+
+
+function App() {
+  const [session, setSession] = useState(loadSession);
+  const [companies, setCompanies] = useState([]);
+  const [periods, setPeriods] = useState([]);
+  const [companyId, setCompanyId] = useState('');
+  const [periodId, setPeriodId] = useState('');
+  const [mapping, setMapping] = useState({ mappings: [], summary: { total: 0, mapped: 0, unmapped: 0 } });
+  const [uploads, setUploads] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [scheduleLines, setScheduleLines] = useState([]);
+  const [message, setMessage] = useState('');
+  const [currentView, setCurrentView] = useState('home');
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+
+  console.log("companyId state =", companyId);
+
+  useEffect(() => {
+    if (!session?.token) return;
+
+    async function initialize() {
+      setToken(session.token);
+
+      const companies = await refreshCompanies();
+      await refreshScheduleLines();
+
+      if (companies.length > 0) {
+        await refreshReports(companies[0].id);
+      } else {
+        setReports([]);
+        setCompanyId("");
+        setPeriodId("");
+      }
+    }
+
+    initialize();
+  }, [session?.token]);
+
+  useEffect(() => {
+
+    console.log("companyId changed:", companyId);
+
+    if (!companyId) return;
+    refreshPeriods(companyId);
+  }, [companyId]);
+
+  useEffect(() => {
+    if (!periodId) return;
+    refreshMapping(periodId);
+    refreshUploads(periodId);
+  }, [periodId]);
+
+  console.log("companies =", companies);
+  console.log("Array?", Array.isArray(companies));
+
+  const selectedCompany = companies.find((item) => item.id === companyId);
+  const selectedPeriod = periods.find((item) => item.id === periodId);
+
+  async function refreshCompanies() {
+    const data = await getCompanies();
+
+    console.log("Companies from API:", data);
+
+    setCompanies(data);
+
+    if (data.length === 0) {
+      setCompanyId("");
+      setPeriodId("");
+      setReports([]);
+      return data;
+    }
+
+    if (!companyId || !data.some(c => c.id === companyId)) {
+      setCompanyId(data[0].id);
+    }
+
+    return data;
+  }
+
+  async function deleteCompany(id) {
+    if (
+      !id ||
+      !confirm(
+        "Delete this company and all associated periods, uploads, and reports?"
+      )
+    ) {
+      return;
+    }
+
+    await deleteCompanyApi(id);
+
+    const companies = await refreshCompanies();
+
+    const nextCompanyId = companies[0]?.id || "";
+
+    setCompanyId(nextCompanyId);
+
+    if (!nextCompanyId) {
+        setPeriodId("");
+        setPeriods([]);
+    }
+
+    await refreshReports(nextCompanyId);
+  }
+
+  async function refreshScheduleLines() {
+    const data = await getScheduleLines();
+    setScheduleLines(data);
+  }
+
+  async function refreshPeriods(id) {
+    const data = await getPeriods(id);
+    setPeriods(data);
+    if (data[0] && !data.some((item) => item.id === periodId)) setPeriodId(data[0].id);
+  }
+
+  async function refreshMapping(id) {
+    const data = await getMapping(id);
+    setMapping(data);
+  }
+
+  async function refreshUploads(id) {
+    const data = await getUploads(id);
+    setUploads(data);
+  }
+
+  async function refreshReports(selectedCompanyId) {
+
+    console.log("refreshReports called with:", selectedCompanyId);
+    
+    setReports(await getReports(selectedCompanyId));
+  }
+
+  async function updateMappingResult(mappingId, scheduleLineId) {
+    if (!periodId || !mappingId || !scheduleLineId) return;
+    await updateMapping(
+      mappingId,
+      periodId,
+      scheduleLineId
+    );
+    await refreshMapping(periodId);
+  }
+
+  async function handleSession(payload) {
+    saveSession(payload);
+    setSession(payload);
+    setShowAuthModal(false);
+  }
+
+  async function logout() {
+    clearSession();
+    setSession(null);
+  }
+
+  if (!session?.token) return <LandingPage onSignup={() => { setAuthMode('signup'); setShowAuthModal(true); }} onLogin={() => { setAuthMode('login'); setShowAuthModal(true); }} onSession={handleSession} showAuth={showAuthModal} authMode={authMode} onCloseAuth={() => setShowAuthModal(false)} />;
+
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand">
+          <div className="brand-mark">CA</div>
+          <div>
+            <strong>CA Portal</strong>
+            <span>Professional Suite</span>
+          </div>
+        </div>
+        <nav>
+          <button type="button" className={currentView === 'home' ? 'active' : ''} onClick={() => setCurrentView('home')}><LayoutDashboard size={18} /> Home</button>
+          <button type="button" className={currentView === 'workspace' ? 'active' : ''} onClick={() => setCurrentView('workspace')}><FileSpreadsheet size={18} /> Workspace</button>
+          <button type="button" className={currentView === 'reports' ? 'active' : ''} onClick={() => setCurrentView('reports')}><FileSpreadsheet size={18} /> Reports</button>
+          <button type="button" className={currentView === 'settings' ? 'active' : ''} onClick={() => setCurrentView('settings')}><Settings size={18} /> Settings</button>
+        </nav>
+      </aside>
+      <main className="workspace">
+        <header className="topbar">
+          <strong>AuditExpress</strong>
+          <div className="topbar-controls">
+            <select value={companyId} onChange={(event) => setCompanyId(event.target.value)}>
+              <option value="">Select company</option>
+              {companies.map((company) => <option key={company.id} value={company.id}>{company.name}</option>)}
+            </select>
+            <select value={periodId} onChange={(event) => setPeriodId(event.target.value)}>
+              <option value="">Select period</option>
+              {periods.map((period) => <option key={period.id} value={period.id}>{period.label}</option>)}
+            </select>
+            <button className="ghost" onClick={logout}><LogOut size={16} /> Sign out</button>
+          </div>
+        </header>
+
+        <section className="page-header">
+          <div>
+            <p>{currentView === 'home' ? 'Welcome to your financial reporting workspace' : currentView === 'workspace' ? 'Workspace / Ind AS Schedule III / Financial Results' : currentView === 'reports' ? 'Reports / Download history' : 'Settings and preferences'}</p>
+            <h1>{currentView === 'home' ? 'Welcome back' : currentView === 'workspace' ? 'Financial Reporting Workspace' : currentView === 'reports' ? 'Report Library' : 'Settings'}</h1>
+          </div>
+          {currentView === 'workspace' && (
+            <div className="actions">
+              <CreateCompany onCreated={async (company) => { await refreshCompanies(); setCompanyId(company.id); }} />
+              {selectedCompany && <CreatePeriod company={selectedCompany} onCreated={async (period) => { await refreshPeriods(companyId); setPeriodId(period.id); }} />}
+            </div>
+          )}
+        </section>
+
+        {currentView === 'home' && (
+          <div>
+            <section className="stats-grid">
+              <Stat label="Companies" value={companies.length} />
+              <Stat label="Uploaded TBs" value={uploads.length} />
+              <Stat label="Mapped Ledgers" value={mapping.summary.mapped} />
+              <Stat label="Unmapped" value={mapping.summary.unmapped} tone={mapping.summary.unmapped ? 'danger' : ''} />
+            </section>
+            <section className="grid-two">
+              <Panel title="Quick Start">
+                <p>Use the workspace to upload trial balances, map ledgers, and generate statutory reports.</p>
+                <div className="actions">
+                  <CreateCompany onCreated={async (company) => { await refreshCompanies(); setCompanyId(company.id); }} />
+                  {selectedCompany && <CreatePeriod company={selectedCompany} onCreated={async (period) => { await refreshPeriods(companyId); setPeriodId(period.id); }} />}
+                </div>
+              </Panel>
+              <Panel title="Selected Company">
+                {selectedCompany ? (
+                  <>
+                    <p><strong>{selectedCompany.name}</strong></p>
+                    <p>{selectedCompany.cin}</p>
+                    <p>{selectedCompany.registeredOffice}</p>
+                    <button className="secondary" type="button" onClick={() => setCurrentView('workspace')}>Go to workspace</button>
+                  </>
+                ) : (
+                  <p className="muted">Create or choose a company to begin reviewing trial balances and generating reports.</p>
+                )}
+              </Panel>
+            </section>
+          </div>
+        )}
+
+        {currentView === 'workspace' && (
+          <>
+            <section className="stats-grid">
+              <Stat label="Companies" value={companies.length} />
+              <Stat label="Uploaded TBs" value={uploads.length} />
+              <Stat label="Mapped Ledgers" value={mapping.summary.mapped} />
+              <Stat label="Unmapped" value={mapping.summary.unmapped} tone={mapping.summary.unmapped ? 'danger' : ''} />
+            </section>
+            <section className="grid-two">
+              <CompanyMetadata company={selectedCompany} onSaved={refreshCompanies} onDeleted={deleteCompany} />
+              <UploadTrialBalance period={selectedPeriod} onUploaded={async (result) => {
+                setMessage(`Parsed ${result.validation.rowCount} rows. Unmapped ledgers: ${result.mappingSummary.unmapped}.`);
+                await refreshMapping(periodId);
+                await refreshUploads(periodId);
+              }} />
+            </section>
+            {message && <div className="notice">{message}</div>}
+            <MappingTable mapping={mapping} scheduleLines={scheduleLines} onMappingUpdated={updateMappingResult} />
+            <ReportGenerator
+              company={selectedCompany}
+              period={selectedPeriod}
+              periods={periods}
+              reports={reports}
+              onGenerated={async () => {
+                setMessage('Report generated. It is available in download history.');
+                await refreshReports(companyId);
+              }}
+            />
+          </>
+        )}
+
+        {currentView === 'reports' && (
+          <ReportsView company={selectedCompany} reports={reports} onDownload={async (report) => {
+            await downloadFile(`/report-runs/${report.id}/download`, report.fileName);
+          }} />
+        )}
+
+        {currentView === 'settings' && (
+          <SettingsView session={session} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+createRoot(document.getElementById('root')).render(<App />);
