@@ -4,6 +4,7 @@ import AsyncButton from "../common/AsyncButton";
 import AsyncDeleteButton from "../common/AsyncDeleteButton";
 import labelize from "../../utils/labelize";
 import { api } from "../services/api";
+import useAsyncStatus from "../../hooks/useAsyncStatus";
 
 export default function CompanyMetadata({ company, onSaved, onDeleted }) {
     const [form, setForm] = useState({});
