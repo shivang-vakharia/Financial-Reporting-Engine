@@ -1,4 +1,4 @@
-import LoadingSpinner from "./loadingSpinner";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function ButtonStatusIcon({ loading, success }) {
     if (loading) {
