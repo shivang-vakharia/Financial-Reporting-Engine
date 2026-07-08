@@ -3,6 +3,19 @@ import AsyncButton from "../common/AsyncButton";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import { Plus } from "lucide-react";
 import { api } from "../services/api";
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
 
 export default function CreateCompany({ onCreated }) {
     const [open, setOpen] = useState(false);

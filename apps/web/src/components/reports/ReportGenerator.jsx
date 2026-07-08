@@ -1,5 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { api } from "../services/api";
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
 
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });

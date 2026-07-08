@@ -5,6 +5,19 @@ import AsyncDeleteButton from "../common/AsyncDeleteButton";
 import labelize from "../../utils/labelize";
 import { api } from "../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
 
 export default function CompanyMetadata({ company, onSaved, onDeleted }) {
     const [form, setForm] = useState({});

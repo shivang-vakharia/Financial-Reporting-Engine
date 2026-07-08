@@ -1,4 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
 
 export default function ReportsView({ company, reports, onDownload }) {
     return (

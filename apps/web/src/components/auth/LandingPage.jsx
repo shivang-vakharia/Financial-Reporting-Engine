@@ -1,6 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AuthScreen from "./AuthScreen";
-import { Building2 } from "lucide-react";
+import {
+Building2,
+Download,
+FileSpreadsheet,
+LayoutDashboard,
+LogOut,
+Plus,
+Settings,
+Upload,
+Wand2,
+Loader2,
+CheckCircle2
+} from "lucide-react";
 
 export default function LandingPage({ onSignup, onLogin, onSession, showAuth, authMode, onCloseAuth }) {
     return (
