@@ -1,3 +1,4 @@
+import React from "react";
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });
     const [comparativePeriodIds, setComparativePeriodIds] = useState([]);

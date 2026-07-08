@@ -1,5 +1,5 @@
+import React from "react";
 import AsyncButton from "../common/AsyncButton";
-
 
 export default function CreateCompany({ onCreated }) {
     const [open, setOpen] = useState(false);

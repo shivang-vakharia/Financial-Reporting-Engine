@@ -1,3 +1,4 @@
+import React from "react";
 export default function Stat({ label, value, tone }) {
     return (
         <div className="stat">

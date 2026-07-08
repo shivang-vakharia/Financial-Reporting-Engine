@@ -1,4 +1,4 @@
-
+import React from "react";
 
 export default function CreatePeriod({ company, onCreated }) {
     const [open, setOpen] = useState(false);

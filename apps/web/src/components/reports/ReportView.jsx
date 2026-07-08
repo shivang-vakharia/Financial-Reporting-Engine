@@ -1,3 +1,4 @@
+import React from "react";
 export default function ReportsView({ company, reports, onDownload }) {
     return (
       <Panel title="Report History">

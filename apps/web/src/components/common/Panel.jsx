@@ -1,3 +1,4 @@
+import React from "react";
 export default function Panel({ title, actions, children }) {
     return ( 
         <section className="panel">

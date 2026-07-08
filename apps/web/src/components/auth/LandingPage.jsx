@@ -1,3 +1,4 @@
+import React from "react";
 import AuthScreen from "./AuthScreen";
 
 export default function LandingPage({ onSignup, onLogin, onSession, showAuth, authMode, onCloseAuth }) {

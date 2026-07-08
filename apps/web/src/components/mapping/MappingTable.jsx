@@ -1,3 +1,4 @@
+import React from "react";
 import Panel from "../common/Panel"
 import formatMoney from "../../utils/formatMoney";
 

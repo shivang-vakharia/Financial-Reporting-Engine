@@ -1,3 +1,4 @@
+import React from "react";
 export default function SettingsView({ session }) {
     return (
       <Panel title="Application Settings">
