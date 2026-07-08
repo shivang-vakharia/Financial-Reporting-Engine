@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import AsyncButton from "../common/AsyncButton";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import { Plus } from "lucide-react";
-import { api } from "../../services/api";
+import { api } from "../services/api";
 
 export default function CreateCompany({ onCreated }) {
     const [open, setOpen] = useState(false);

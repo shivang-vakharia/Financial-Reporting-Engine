@@ -2,7 +2,7 @@ import Panel from "../common/Panel";
 import AsyncButton from "../common/AsyncButton"
 import LoadingSpinner from "../common/LoadingSpinner";
 import React, { useState, useEffect, useMemo } from "react";
-import { api } from "../../services/api";
+import { api } from "../services/api";
 
 export default function UploadTrialBalance({ period, onUploaded }) {
     const [file, setFile] = useState(null);
