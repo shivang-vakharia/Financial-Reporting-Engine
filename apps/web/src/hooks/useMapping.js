@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
     getMapping,
     updateMapping
-} from "../services/mappingService";
+} from "../components/services/mappingService";
 
 export default function useMapping() {
 

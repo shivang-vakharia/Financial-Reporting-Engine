@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getUploads } from "../services/uploadService";
+import { getUploads } from "../components/services/uploadService";
 
 export default function useUploads() {
 
