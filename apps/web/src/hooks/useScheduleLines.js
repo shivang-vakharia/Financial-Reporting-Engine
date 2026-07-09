@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getScheduleLines } from "../components/services/scheduleService";
+import { getScheduleLines } from "../services/scheduleService";
 
 export default function useScheduleLines() {
 
@@ -11,14 +11,16 @@ export default function useScheduleLines() {
 
         setScheduleLines(data);
 
+        return data;
+    }
+
+    function clearScheduleLines() {
+        setScheduleLines([]);
     }
 
     return {
-
         scheduleLines,
-
-        refreshScheduleLines
-
+        refreshScheduleLines,
+        clearScheduleLines
     };
-
 }

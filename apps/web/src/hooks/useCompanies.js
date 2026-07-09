@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { getCompanies } from "../components/services/companyService";
+import { getCompanies } from "../services/companyService";
 
 export default function useCompanies() {
 
@@ -7,7 +7,7 @@ export default function useCompanies() {
     const [companyId, setCompanyId] = useState("");
 
     const selectedCompany = useMemo(() => {
-        return companies.find(c => c.id === companyId);
+        return companies.find(company => company.id === companyId);
     }, [companies, companyId]);
 
     async function refreshCompanies() {
@@ -19,20 +19,17 @@ export default function useCompanies() {
         return data;
     }
 
+    function clearCompanies() {
+        setCompanies([]);
+        setCompanyId("");
+    }
+
     return {
-
         companies,
-
-        setCompanies,
-
         companyId,
-
         setCompanyId,
-
         selectedCompany,
-
-        refreshCompanies
-
+        refreshCompanies,
+        clearCompanies
     };
-
 }

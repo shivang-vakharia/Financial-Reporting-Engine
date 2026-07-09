@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
 Building2,
@@ -14,48 +14,18 @@ Loader2,
 CheckCircle2
 } from "lucide-react";
   
-import { downloadFile, setToken } from "../components/services/api.js";
+import { downloadFile } from "../components/services/api.js";
 
 import {
-    getCompanies,
     deleteCompany as deleteCompanyApi,
 } from "../components/services/companyService.js";
-
-import {
-    getPeriods,
-} from "../components/services/periodService.js";
-
-import {
-    getMapping,
-    updateMapping,
-} from "../components/services/mappingService.js";
-
-import {
-    getUploads,
-} from "../components/services/uploadService.js";
-
-import {
-    getReports,
-} from "../components/services/reportService.js";
-
-import {
-    getScheduleLines,
-} from "../components/services/scheduleService.js";
 
 import {
     setAuthSession,
     clearAuthSession,
 } from "../components/services/authService.js";
 import '../styles/styles.css';
-
-import formatMoney from '../utils/formatMoney.js';
-import labelize from '../utils/labelize.js';
-import useAsyncStatus from "../hooks/useAsyncStatus";
-import AuthScreen from "../components/auth/AuthScreen.jsx";
 import LandingPage from "../components/auth/LandingPage.jsx";
-import AsyncButton from '../components/common/AsyncButton.jsx';
-import AsyncDeleteButton from "../components/common/AsyncDeleteButton.jsx";
-import Field from "../components/common/Field.jsx";
 import Panel from "../components/common/Panel.jsx";
 import Stat from "../components/common/Stat.jsx";
 import CompanyMetadata from "../components/company/CompanyMetadata.jsx";
@@ -78,6 +48,7 @@ function App() {
   const [currentView, setCurrentView] = useState('home');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
+  const [message, setMessage] = useState("");
   const {
 
     companies,
@@ -97,7 +68,7 @@ function App() {
     refreshPeriods
 
   } = usePeriods();
-u
+
   const {
 
     mapping,
@@ -119,8 +90,9 @@ u
   } = useScheduleLines();
 
   const {
-    reports,
-    refreshReports,
+      reports,
+      refreshReports,
+      clearReports
   } = useReports();
 
   useEffect(() => {
@@ -128,28 +100,32 @@ u
 
     async function initialize() {
 
-      const companies = await refreshCompanies();
-
-      if (
-          !companyId ||
-          !companies.some(c => c.id === companyId)
-      ) {
-
-          setCompanyId(companies[0].id);
-
-          await refreshReports(companies[0].id);
-
-      }
+      const companyList = await refreshCompanies();
 
       await refreshScheduleLines();
 
-      if (companies.length > 0) {
-        await refreshReports(companies[0].id);
-      } else {
-        setReports([]);
+      if (companyList.length === 0) {
+
+        clearReports();
+
         setCompanyId("");
+
         setPeriodId("");
+
+        return;
+
       }
+
+      const nextCompanyId =
+        companyId &&
+        companyList.some(c => c.id === companyId)
+          ? companyId
+          : companyList[0].id;
+
+      setCompanyId(nextCompanyId);
+
+      await refreshReports(nextCompanyId);
+
     }
 
     initialize();
@@ -158,20 +134,36 @@ u
   useEffect(() => {
 
     if (!companyId) {
-        setPeriodId("");
-        return;
+
+      setPeriodId("");
+
+      return;
+
     }
 
     async function loadPeriods() {
 
-      const periodList = await refreshPeriods(companyId);
+      const periodList =
+        await refreshPeriods(companyId);
+
+        if (periodList.length === 0) {
+
+          setPeriodId("");
+
+          return;
+
+        }
 
         if (
-          periodList.length > 0 &&
-          !periodList.some(period => period.id === periodId)
+            !periodList.some(
+                period => period.id === periodId
+            )
         ) {
+
           setPeriodId(periodList[0].id);
+
         }
+
     }
 
     loadPeriods();
@@ -186,6 +178,7 @@ u
 
   
   async function deleteCompany(id) {
+
     if (
       !id ||
       !confirm(
@@ -197,19 +190,27 @@ u
 
     await deleteCompanyApi(id);
 
-    const companies = await refreshCompanies();
+    const companyList = await refreshCompanies();
 
-    const nextCompanyId = companies[0]?.id || "";
+    if (companyList.length === 0) {
+
+      clearReports();
+
+      setCompanyId("");
+
+      setPeriodId("");
+
+      return;
+
+  }
+
+    const nextCompanyId = companyList[0].id;
 
     setCompanyId(nextCompanyId);
 
-    if (!nextCompanyId) {
-        setPeriodId("");
-        setPeriods([]);
-    }
-
     await refreshReports(nextCompanyId);
-  }
+
+}
 
   async function handleSession(payload) {
     setAuthSession(payload);

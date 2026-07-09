@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getUploads } from "../components/services/uploadService";
+import { getUploads } from "../services/uploadService";
 
 export default function useUploads() {
 
@@ -8,25 +8,24 @@ export default function useUploads() {
     async function refreshUploads(periodId) {
 
         if (!periodId) {
-
             setUploads([]);
-
-            return;
-
+            return [];
         }
 
         const data = await getUploads(periodId);
 
         setUploads(data);
 
+        return data;
+    }
+
+    function clearUploads() {
+        setUploads([]);
     }
 
     return {
-
         uploads,
-
-        refreshUploads
-
+        refreshUploads,
+        clearUploads
     };
-
 }

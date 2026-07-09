@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getReports } from "../components/services/reportService";
+import { getReports } from "../services/reportService";
 
 export default function useReports() {
 
@@ -11,16 +11,16 @@ export default function useReports() {
 
         setReports(data);
 
+        return data;
+    }
+
+    function clearReports() {
+        setReports([]);
     }
 
     return {
-
         reports,
-
         refreshReports,
-
-        setReports
-
+        clearReports
     };
-
 }

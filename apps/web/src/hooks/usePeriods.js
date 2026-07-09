@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { getPeriods } from "../components/services/periodService";
+import { getPeriods } from "../services/periodService";
 
 export default function usePeriods() {
 
@@ -13,8 +13,7 @@ export default function usePeriods() {
     async function refreshPeriods(companyId) {
 
         if (!companyId) {
-            setPeriods([]);
-            setPeriodId("");
+            clearPeriods();
             return [];
         }
 
@@ -25,12 +24,17 @@ export default function usePeriods() {
         return data;
     }
 
+    function clearPeriods() {
+        setPeriods([]);
+        setPeriodId("");
+    }
+
     return {
         periods,
         periodId,
         setPeriodId,
         selectedPeriod,
-        refreshPeriods
+        refreshPeriods,
+        clearPeriods
     };
-
 }
