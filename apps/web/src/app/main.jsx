@@ -68,14 +68,13 @@ import SettingsView from '../components/settings/SettingsView.jsx';
 import UploadTrialBalance from "../components/upload/UploadTrialBalance.jsx";
 import useCompanies from "../hooks/useCompanies";
 import usePeriods from "../hooks/usePeriods";
+import useMapping from "../hooks/useMapping";
+import useScheduleLines from '../hooks/useScheduleLines.js';
+import useUploads from '../hooks/useUploads.js';
+import useReports from '../hooks/useReports.js';
 
 function App() {
   const [session, setSession] = useState(null);
-  const [mapping, setMapping] = useState({ mappings: [], summary: { total: 0, mapped: 0, unmapped: 0 } });
-  const [uploads, setUploads] = useState([]);
-  const [reports, setReports] = useState([]);
-  const [scheduleLines, setScheduleLines] = useState([]);
-  const [message, setMessage] = useState('');
   const [currentView, setCurrentView] = useState('home');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -97,7 +96,32 @@ function App() {
     selectedPeriod,
     refreshPeriods
 
-} = usePeriods();
+  } = usePeriods();
+u
+  const {
+
+    mapping,
+    refreshMapping,
+    updateMappingResult
+
+  } = useMapping();
+
+  const {
+
+    uploads,
+    refreshUploads
+
+  } = useUploads();
+
+  const {
+    scheduleLines,
+    refreshScheduleLines
+  } = useScheduleLines();
+
+  const {
+    reports,
+    refreshReports,
+  } = useReports();
 
   useEffect(() => {
     if (!session?.token) return;
@@ -185,36 +209,6 @@ function App() {
     }
 
     await refreshReports(nextCompanyId);
-  }
-
-  async function refreshScheduleLines() {
-    const data = await getScheduleLines();
-    setScheduleLines(data);
-  }
-
-  async function refreshMapping(id) {
-    const data = await getMapping(id);
-    setMapping(data);
-  }
-
-  async function refreshUploads(id) {
-    const data = await getUploads(id);
-    setUploads(data);
-  }
-
-  async function refreshReports(selectedCompanyId) {
-    
-    setReports(await getReports(selectedCompanyId));
-  }
-
-  async function updateMappingResult(mappingId, scheduleLineId) {
-    if (!periodId || !mappingId || !scheduleLineId) return;
-    await updateMapping(
-      mappingId,
-      periodId,
-      scheduleLineId
-    );
-    await refreshMapping(periodId);
   }
 
   async function handleSession(payload) {
