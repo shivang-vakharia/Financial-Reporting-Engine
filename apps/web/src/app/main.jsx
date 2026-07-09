@@ -80,8 +80,15 @@ function App() {
   const [currentView, setCurrentView] = useState('home');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
+  const {
 
-  console.log("companyId state =", companyId);
+    companies,
+    companyId,
+    setCompanyId,
+    selectedCompany,
+    refreshCompanies
+    
+  } = useCompanies();
 
   useEffect(() => {
     if (!session?.token) return;
@@ -90,14 +97,7 @@ function App() {
 
       const companies = await refreshCompanies();
 
-      if (companies.length === 0) {
-
-          setCompanyId("");
-          setPeriodId("");
-          setReports([]);
-
-      }
-      else if (
+      if (
           !companyId ||
           !companies.some(c => c.id === companyId)
       ) {
@@ -107,7 +107,7 @@ function App() {
           await refreshReports(companies[0].id);
 
       }
-      
+
       await refreshScheduleLines();
 
       if (companies.length > 0) {
@@ -124,8 +124,6 @@ function App() {
 
   useEffect(() => {
 
-    console.log("companyId changed:", companyId);
-
     if (!companyId) return;
     refreshPeriods(companyId);
   }, [companyId]);
@@ -136,26 +134,7 @@ function App() {
     refreshUploads(periodId);
   }, [periodId]);
 
-  console.log("companies =", companies);
-  console.log("Array?", Array.isArray(companies));
-
   const selectedPeriod = periods.find((item) => item.id === periodId);
-  
-  const {
-
-    companies,
-
-    setCompanies,
-
-    companyId,
-
-    setCompanyId,
-
-    selectedCompany,
-
-    refreshCompanies
-
-  } = useCompanies();
   
   async function deleteCompany(id) {
     if (
@@ -205,8 +184,6 @@ function App() {
   }
 
   async function refreshReports(selectedCompanyId) {
-
-    console.log("refreshReports called with:", selectedCompanyId);
     
     setReports(await getReports(selectedCompanyId));
   }
