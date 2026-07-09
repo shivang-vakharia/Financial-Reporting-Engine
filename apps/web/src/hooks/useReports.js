@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getReports } from "../services/reportService";
+import { getReports } from "../components/services/reportService";
 
 export default function useReports() {
 
