@@ -10,6 +10,8 @@ import Panel from "../common/Panel"
 export default function CompanyMetadata({ company, onSaved, onDeleted }) {
     const [form, setForm] = useState({});
 
+    const [touched, setTouched] = useState({});
+
     const requiredFields = [
       "name",
       "cin",
@@ -29,13 +31,16 @@ export default function CompanyMetadata({ company, onSaved, onDeleted }) {
 
     const { loading, success, run } = useAsyncStatus();
     useEffect(() => {
-      if (company) setForm(
-        { ...company.metadata, 
-          name: company.name, 
-          cin: company.cin, 
-          registeredOffice: company.registeredOffice
-        });
+      if (!company) return;
 
+      setForm({
+        ...company.metadata,
+        name: company.name,
+        cin: company.cin,
+        registeredOffice: company.registeredOffice,
+      });
+
+      setTouched({});
     }, [company?.id]);
     if (!company) 
       return <Panel title="Company Metadata">
@@ -52,7 +57,7 @@ export default function CompanyMetadata({ company, onSaved, onDeleted }) {
           method: "PATCH",
           body: JSON.stringify(form),
         });
-
+        setTouched({});
         onSaved();
       });
     }
@@ -79,12 +84,21 @@ export default function CompanyMetadata({ company, onSaved, onDeleted }) {
               key={key}
               label={labelize(key)}
               value={form[key] || ""}
-              error={(form[key] ?? "").toString().trim() === ""}
+              error={
+                touched[key] &&
+                (form[key] ?? "").toString().trim() === ""
+              }
               onChange={(value) =>
                 setForm({
-                  ...form,
-                  [key]: value,
+                    ...form,
+                    [key]: value,
                 })
+              }
+              onBlur={() =>
+                setTouched((previous) => ({
+                  ...previous,
+                  [key]: true,
+                }))
               }
             />
 

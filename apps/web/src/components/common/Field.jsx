@@ -4,10 +4,11 @@ export default function Field({
     label,
     value,
     onChange,
+    onBlur,
     type = "text",
     error = false,
     disabled = false,
-    placeholder = ""
+    placeholder = "",
 }) {
     return (
         <label className="field">
@@ -20,6 +21,7 @@ export default function Field({
                 disabled={disabled}
                 className={error ? "field-input error" : "field-input"}
                 onChange={(event) => onChange(event.target.value)}
+                onBlur={onBlur}
             />
         </label>
     );
