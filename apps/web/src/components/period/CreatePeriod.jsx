@@ -19,19 +19,33 @@ export default function CreatePeriod({ company, onCreated }) {
     async function submit(event) {
       event.preventDefault();
 
-      await run(async () => {
-        const period = await api(
-          `/companies/${company.id}/periods`,
-          {
-            method: "POST",
-            body: JSON.stringify(form),
-          }
-        );
+      try {
 
-        setOpen(false);
+        await run(async () => {
 
-        onCreated(period);
-      });
+          const period = await api(
+            `/companies/${company.id}/periods`,
+            {
+              method: "POST",
+              body: JSON.stringify(form),
+            }
+          );
+
+          setOpen(false);
+
+          onCreated(period);
+
+        });
+
+      } catch (error) {
+
+        if (error.status === 409) {
+          alert(error.message);
+          return;
+        }
+
+        alert(error.message);
+      }
     }
 
     return open ? (

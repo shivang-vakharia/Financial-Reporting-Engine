@@ -37,7 +37,7 @@ export function createPostgresRepository(pool) {
         ? companyFromRow(result.rows[0])
         : null;
     },
-    
+
     async createCompany(company) {
       const result = await pool.query(
         `INSERT INTO companies (id, owner_id, name, cin, registered_office, reporting_framework, metadata, created_at)
@@ -72,6 +72,24 @@ export function createPostgresRepository(pool) {
     async listPeriods(companyId) {
       const result = await pool.query('SELECT * FROM reporting_periods WHERE company_id = $1 ORDER BY end_date DESC', [companyId]);
       return result.rows.map(periodFromRow);
+    },
+
+    async findPeriodByDates(companyId, startDate, endDate) {
+      const result = await pool.query(
+        `
+        SELECT *
+        FROM reporting_periods
+        WHERE company_id = $1
+          AND start_date = $2
+          AND end_date = $3
+        LIMIT 1
+        `,
+        [companyId, startDate, endDate]
+      );
+
+      return result.rows[0]
+        ? periodFromRow(result.rows[0])
+        : null;
     },
     async createPeriod(period) {
       const result = await pool.query(

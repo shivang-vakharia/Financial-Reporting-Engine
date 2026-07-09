@@ -199,12 +199,36 @@ app.get('/companies/:companyId/periods', requireAuth, async (req, res) => {
 });
 
 app.post('/companies/:companyId/periods', requireAuth, async (req, res) => {
+
   const company = await findCompany(req, res);
   if (!company) return;
-  const { label, periodType, startDate, endDate, financialYear } = req.body;
+
+  const {
+    label,
+    periodType,
+    startDate,
+    endDate,
+    financialYear
+  } = req.body;
+
   if (!label || !periodType || !startDate || !endDate) {
-    return res.status(400).json({ error: 'Label, period type, start date, and end date are required.' });
+    return res.status(400).json({
+      error: "Label, period type, start date, and end date are required."
+    });
   }
+
+  const existingPeriod = await repository.findPeriodByDates(
+    company.id,
+    startDate,
+    endDate
+  );
+
+  if (existingPeriod) {
+    return res.status(409).json({
+      error: "A reporting period with these dates already exists."
+    });
+  }
+
   const period = {
     id: uuid(),
     companyId: company.id,
@@ -215,7 +239,24 @@ app.post('/companies/:companyId/periods', requireAuth, async (req, res) => {
     financialYear: financialYear || deriveFinancialYear(endDate),
     createdAt: new Date().toISOString()
   };
-  res.status(201).json(await repository.createPeriod(period));
+
+  try {
+
+    const createdPeriod = await repository.createPeriod(period);
+
+    return res.status(201).json(createdPeriod);
+
+  } catch (error) {
+
+    if (error.code === "23505") {
+      return res.status(409).json({
+        error: "A reporting period with these dates already exists."
+      });
+    }
+
+    throw error;
+  }
+
 });
 
 app.post('/periods/:periodId/uploads', requireAuth, upload.single('trialBalance'), async (req, res) => {
