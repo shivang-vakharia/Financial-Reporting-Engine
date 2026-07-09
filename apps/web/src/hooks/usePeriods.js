@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { getPeriods } from "../services/periodService";
+import { getPeriods } from "../components/services/periodService";
 
 export default function usePeriods() {
 
