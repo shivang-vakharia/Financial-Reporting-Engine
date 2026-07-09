@@ -43,12 +43,11 @@ import {
 } from "../components/services/scheduleService.js";
 
 import {
-    saveSession,
-    clearSession,
+    setAuthSession,
+    clearAuthSession,
 } from "../components/services/authService.js";
 import '../styles/styles.css';
 
-import loadSession from '../utils/loadSession.js';
 import formatMoney from '../utils/formatMoney.js';
 import labelize from '../utils/labelize.js';
 import useAsyncStatus from "../hooks/useAsyncStatus";
@@ -70,7 +69,7 @@ import UploadTrialBalance from "../components/upload/UploadTrialBalance.jsx";
 
 
 function App() {
-  const [session, setSession] = useState(loadSession);
+  const [session, setSession] = useState(null);
   const [companies, setCompanies] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [companyId, setCompanyId] = useState('');
@@ -86,26 +85,11 @@ function App() {
 
   console.log("companyId state =", companyId);
 
-  useEffect(() => {
-    if (!session?.token) return;
+  uuseEffect(() => {
+    if (!session) return;
 
-    async function initialize() {
-      setToken(session.token);
-
-      const companies = await refreshCompanies();
-      await refreshScheduleLines();
-
-      if (companies.length > 0) {
-        await refreshReports(companies[0].id);
-      } else {
-        setReports([]);
-        setCompanyId("");
-        setPeriodId("");
-      }
-    }
-
-    initialize();
-  }, [session?.token]);
+      initialize();
+  }, [session]);
 
   useEffect(() => {
 
@@ -214,13 +198,13 @@ function App() {
   }
 
   async function handleSession(payload) {
-    saveSession(payload);
+    setAuthSession(payload);
     setSession(payload);
     setShowAuthModal(false);
   }
 
   async function logout() {
-    clearSession();
+    clearAuthSession();
     setSession(null);
   }
 
