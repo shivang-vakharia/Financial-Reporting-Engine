@@ -66,13 +66,11 @@ import ReportGenerator from '../components/reports/ReportGenerator.jsx';
 import ReportsView from '../components/reports/ReportView.jsx';
 import SettingsView from '../components/settings/SettingsView.jsx';
 import UploadTrialBalance from "../components/upload/UploadTrialBalance.jsx";
-
+import useCompanies from "../hooks/useCompanies";
 
 function App() {
   const [session, setSession] = useState(null);
-  const [companies, setCompanies] = useState([]);
   const [periods, setPeriods] = useState([]);
-  const [companyId, setCompanyId] = useState('');
   const [periodId, setPeriodId] = useState('');
   const [mapping, setMapping] = useState({ mappings: [], summary: { total: 0, mapped: 0, unmapped: 0 } });
   const [uploads, setUploads] = useState([]);
@@ -91,6 +89,25 @@ function App() {
     async function initialize() {
 
       const companies = await refreshCompanies();
+
+      if (companies.length === 0) {
+
+          setCompanyId("");
+          setPeriodId("");
+          setReports([]);
+
+      }
+      else if (
+          !companyId ||
+          !companies.some(c => c.id === companyId)
+      ) {
+
+          setCompanyId(companies[0].id);
+
+          await refreshReports(companies[0].id);
+
+      }
+      
       await refreshScheduleLines();
 
       if (companies.length > 0) {
@@ -122,31 +139,24 @@ function App() {
   console.log("companies =", companies);
   console.log("Array?", Array.isArray(companies));
 
-  const selectedCompany = companies.find((item) => item.id === companyId);
   const selectedPeriod = periods.find((item) => item.id === periodId);
+  
+  const {
 
-  async function refreshCompanies() {
-    const data = await getCompanies();
+    companies,
 
-    console.log("getCompanies returned:", data);
-    console.log("Is array?", Array.isArray(data));
+    setCompanies,
 
-    setCompanies(data);
+    companyId,
 
-    if (data.length === 0) {
-      setCompanyId("");
-      setPeriodId("");
-      setReports([]);
-      return data;
-    }
+    setCompanyId,
 
-    if (!companyId || !data.some(c => c.id === companyId)) {
-      setCompanyId(data[0].id);
-    }
+    selectedCompany,
 
-    return data;
-  }
+    refreshCompanies
 
+  } = useCompanies();
+  
   async function deleteCompany(id) {
     if (
       !id ||
