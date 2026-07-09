@@ -3,6 +3,7 @@ import { api } from "../services/api";
 import Panel from "../common/Panel"
 import { Download, Wand2 } from 'lucide-react';
 import { downloadFile, setToken } from "../services/api.js";
+import AsyncButton from "../common/AsyncButton";
 
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });
@@ -33,7 +34,15 @@ export default function ReportGenerator({ company, period, periods, reports, onG
       }
     }
     return (
-      <Panel title="Report Generation and History" actions={<button className="primary" onClick={generate} disabled={!company || !period}><Wand2 size={16} /> Generate Excel</button>}>
+      <Panel title="Report Generation and History" actions={
+        <AsyncButton
+          className="primary"
+          onClick={generate}
+          disabled={!company || !period}
+        >
+          <Wand2 size={16} />
+          Generate Excel
+        </AsyncButton>}>
         <div className="report-options">
           <label>Report type</label>
           <select value={metadata.reportType} onChange={(event) => setMetadata({ ...metadata, reportType: event.target.value })}>
