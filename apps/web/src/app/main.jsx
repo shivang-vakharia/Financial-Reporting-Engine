@@ -86,10 +86,24 @@ function App() {
   console.log("companyId state =", companyId);
 
   useEffect(() => {
-    if (!session) return;
+    if (!session?.token) return;
 
-      initialize();
-  }, [session]);
+    async function initialize() {
+
+      const companies = await refreshCompanies();
+      await refreshScheduleLines();
+
+      if (companies.length > 0) {
+        await refreshReports(companies[0].id);
+      } else {
+        setReports([]);
+        setCompanyId("");
+        setPeriodId("");
+      }
+    }
+
+    initialize();
+  }, [session?.token]);
 
   useEffect(() => {
 
