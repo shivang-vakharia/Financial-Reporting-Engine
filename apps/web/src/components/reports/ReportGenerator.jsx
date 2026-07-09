@@ -4,6 +4,13 @@ import Panel from "../common/Panel"
 import { Download, Wand2 } from 'lucide-react';
 import { downloadFile, setToken } from "../services/api.js";
 import AsyncButton from "../common/AsyncButton";
+import useAsyncStatus from "../../hooks/useAsyncStatus";
+
+const {
+    loading,
+    success,
+    run,
+} = useAsyncStatus();
 
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });
@@ -18,13 +25,23 @@ export default function ReportGenerator({ company, period, periods, reports, onG
 
     async function generate() {
       if (!period) return;
-      setError('');
-      await api(`/periods/${period.id}/report-runs`, {
-        method: 'POST',
-        body: JSON.stringify({ reportType: metadata.reportType, metadata, comparativePeriodIds })
+
+      setError("");
+
+      await run(async () => {
+        await api(`/periods/${period.id}/report-runs`, {
+          method: "POST",
+          body: JSON.stringify({
+            reportType: metadata.reportType,
+            metadata,
+            comparativePeriodIds,
+          }),
+        });
+
+        await onGenerated();
       });
-      onGenerated();
     }
+
     async function downloadReport(report) {
       setError('');
       try {
@@ -36,13 +53,16 @@ export default function ReportGenerator({ company, period, periods, reports, onG
     return (
       <Panel title="Report Generation and History" actions={
         <AsyncButton
-          className="primary"
+          loading={loading}
+          success={success}
           onClick={generate}
           disabled={!company || !period}
+          className="primary"
         >
           <Wand2 size={16} />
           Generate Excel
         </AsyncButton>}>
+
         <div className="report-options">
           <label>Report type</label>
           <select value={metadata.reportType} onChange={(event) => setMetadata({ ...metadata, reportType: event.target.value })}>
