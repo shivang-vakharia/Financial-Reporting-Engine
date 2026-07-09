@@ -10,11 +10,40 @@ import Panel from "../common/Panel"
 export default function CompanyMetadata({ company, onSaved, onDeleted }) {
     const [form, setForm] = useState({});
 
+    const requiredFields = [
+      "name",
+      "cin",
+      "registeredOffice",
+      "auditStatus",
+      "boardMeetingDate",
+      "paidUpCapital",
+      "faceValue",
+      "directorName",
+      "din",
+      "place"
+    ];
+
+    const isMetadataValid = requiredFields.every(
+      (field) => (form[field] ?? "").toString().trim() !== ""
+    );
+
     const { loading, success, run } = useAsyncStatus();
     useEffect(() => {
-      if (company) setForm({ ...company.metadata, name: company.name, cin: company.cin, registeredOffice: company.registeredOffice });
+      if (company) setForm(
+        { ...company.metadata, 
+          name: company.name, 
+          cin: company.cin, 
+          registeredOffice: company.registeredOffice
+        });
+
     }, [company?.id]);
-    if (!company) return <Panel title="Company Metadata"><p className="muted">Create a company to begin.</p></Panel>;
+    if (!company) 
+      return <Panel title="Company Metadata">
+        <p className="muted">
+          Create a company to begin.
+        </p>
+      </Panel>;
+
     async function save(event) {
       event.preventDefault();
 
@@ -35,13 +64,36 @@ export default function CompanyMetadata({ company, onSaved, onDeleted }) {
         />
       }>
         <form className="metadata-grid" onSubmit={save}>
-          {['name', 'cin', 'registeredOffice', 'auditStatus', 'boardMeetingDate', 'paidUpCapital', 'faceValue', 'directorName', 'din', 'place'].map((key) => (
-            <Field key={key} label={labelize(key)} value={form[key] || ''} onChange={(value) => setForm({ ...form, [key]: value })} />
+          {['name', 
+            'cin',
+            'registeredOffice',
+            'auditStatus',
+            'boardMeetingDate',
+            'paidUpCapital',
+            'faceValue',
+            'directorName',
+            'din',
+            'place'
+          ].map((key) => (
+            <Field
+              key={key}
+              label={labelize(key)}
+              value={form[key] || ""}
+              error={(form[key] ?? "").toString().trim() === ""}
+              onChange={(value) =>
+                setForm({
+                  ...form,
+                  [key]: value,
+                })
+              }
+            />
+
           ))}
           <AsyncButton
             loading={loading}
             success={success}
             type="submit"
+            disabled={!isMetadataValid}
         >
             {loading
                 ? "Saving..."

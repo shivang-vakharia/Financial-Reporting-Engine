@@ -962,3 +962,28 @@ margin-bottom:4px;
 .upload-summary strong{
 font-size:20px;
 }
+
+.field-input {
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.field-input.error {
+    border: 2px solid #dc2626;
+    background-color: #fef2f2;
+}
+
+.field-input.error:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    transform: none;
+}
