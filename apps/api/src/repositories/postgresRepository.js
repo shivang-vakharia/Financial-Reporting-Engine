@@ -37,6 +37,7 @@ export function createPostgresRepository(pool) {
         ? companyFromRow(result.rows[0])
         : null;
     },
+    
     async createCompany(company) {
       const result = await pool.query(
         `INSERT INTO companies (id, owner_id, name, cin, registered_office, reporting_framework, metadata, created_at)

@@ -17,32 +17,38 @@ export default function CreateCompany({ onCreated }) {
 
     async function submit(event) {
       event.preventDefault();
+
       try {
-      await run(async () => {
-        
-        const company = await api("/companies", {
-          method: "POST",
-          body: JSON.stringify(form),
+
+        await run(async () => {
+
+          const company = await api("/companies", {
+            method: "POST",
+            body: JSON.stringify(form),
+          });
+
+          setOpen(false);
+
+          setForm({
+            name: "",
+            cin: "",
+            registeredOffice: "",
+          });
+
+          onCreated(company);
+
         });
 
-        setOpen(false);
-
-        setForm({
-          name: "",
-          cin: "",
-          registeredOffice: "",
-        });
-
-        onCreated(company);
-      });
       } catch (error) {
-          if (error.status === 409) {
-            alert(error.message);
-            return;
-          }
+
+        if (error.status === 409) {
           alert(error.message);
+          return;
         }
+
+        alert(error.message);
       }
+    }
 
     return open ? (
       <form

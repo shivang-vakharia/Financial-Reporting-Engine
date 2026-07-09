@@ -130,32 +130,59 @@ app.get('/companies', requireAuth, async (req, res) => {
 });
 
 app.post('/companies', requireAuth, async (req, res) => {
-  const { name, cin, registeredOffice, reportingFramework = 'division_ii_ind_as' } = req.body;
-  if (!name) return res.status(400).json({ error: 'Company name is required.' });
-  
-  const existingCompany =
-    await repository.findCompanyByCin(
-      req.user.id,
-      req.body.cin
-    );
+  const {
+    name,
+    cin,
+    registeredOffice,
+    reportingFramework = "division_ii_ind_as"
+  } = req.body;
+
+  if (!name) {
+    return res.status(400).json({
+      error: "Company name is required."
+    });
+  }
+
+  const existingCompany = await repository.findCompanyByCin(
+    req.user.sub,
+    cin
+  );
 
   if (existingCompany) {
     return res.status(409).json({
-      error:
-        "A company with this CIN already exists."
+      error: "A company with this CIN already exists."
     });
   }
+
   const company = {
     id: uuid(),
     ownerId: req.user.sub,
     name,
-    cin: cin || '',
-    registeredOffice: registeredOffice || '',
+    cin: cin || "",
+    registeredOffice: registeredOffice || "",
     reportingFramework,
     metadata: {},
     createdAt: new Date().toISOString()
   };
-  res.status(201).json(await repository.createCompany(company));
+
+  try {
+
+    const createdCompany =
+      await repository.createCompany(company);
+
+    return res.status(201).json(createdCompany);
+
+  } catch (error) {
+
+    // PostgreSQL UNIQUE constraint
+    if (error.code === "23505") {
+      return res.status(409).json({
+        error: "A company with this CIN already exists."
+      });
+    }
+
+    throw error;
+  }
 });
 
 app.patch('/companies/:companyId/metadata', requireAuth, async (req, res) => {
