@@ -67,11 +67,10 @@ import ReportsView from '../components/reports/ReportView.jsx';
 import SettingsView from '../components/settings/SettingsView.jsx';
 import UploadTrialBalance from "../components/upload/UploadTrialBalance.jsx";
 import useCompanies from "../hooks/useCompanies";
+import usePeriods from "../hooks/usePeriods";
 
 function App() {
   const [session, setSession] = useState(null);
-  const [periods, setPeriods] = useState([]);
-  const [periodId, setPeriodId] = useState('');
   const [mapping, setMapping] = useState({ mappings: [], summary: { total: 0, mapped: 0, unmapped: 0 } });
   const [uploads, setUploads] = useState([]);
   const [reports, setReports] = useState([]);
@@ -89,6 +88,16 @@ function App() {
     refreshCompanies
     
   } = useCompanies();
+
+  const {
+
+    periods,
+    periodId,
+    setPeriodId,
+    selectedPeriod,
+    refreshPeriods
+
+} = usePeriods();
 
   useEffect(() => {
     if (!session?.token) return;
@@ -124,8 +133,25 @@ function App() {
 
   useEffect(() => {
 
-    if (!companyId) return;
-    refreshPeriods(companyId);
+    if (!companyId) {
+        setPeriodId("");
+        return;
+    }
+
+    async function loadPeriods() {
+
+      const periodList = await refreshPeriods(companyId);
+
+        if (
+          periodList.length > 0 &&
+          !periodList.some(period => period.id === periodId)
+        ) {
+          setPeriodId(periodList[0].id);
+        }
+    }
+
+    loadPeriods();
+
   }, [companyId]);
 
   useEffect(() => {
@@ -134,7 +160,6 @@ function App() {
     refreshUploads(periodId);
   }, [periodId]);
 
-  const selectedPeriod = periods.find((item) => item.id === periodId);
   
   async function deleteCompany(id) {
     if (
@@ -165,12 +190,6 @@ function App() {
   async function refreshScheduleLines() {
     const data = await getScheduleLines();
     setScheduleLines(data);
-  }
-
-  async function refreshPeriods(id) {
-    const data = await getPeriods(id);
-    setPeriods(data);
-    if (data[0] && !data.some((item) => item.id === periodId)) setPeriodId(data[0].id);
   }
 
   async function refreshMapping(id) {
