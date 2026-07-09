@@ -2,26 +2,29 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { api } from "../services/api";
 import Panel from "../common/Panel"
 import { Download, Wand2 } from 'lucide-react';
-import { downloadFile, setToken } from "../services/api.js";
+import { downloadFile } from "../services/api.js";
 import AsyncButton from "../common/AsyncButton";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
-
-const {
-    loading,
-    success,
-    run,
-} = useAsyncStatus();
 
 export default function ReportGenerator({ company, period, periods, reports, onGenerated }) {
     const [metadata, setMetadata] = useState({ reportType: 'standalone' });
     const [comparativePeriodIds, setComparativePeriodIds] = useState([]);
     const [error, setError] = useState('');
 
+    const {
+      loading,
+      success,
+      run,
+    } = useAsyncStatus();
+
     useEffect(() => {
       setComparativePeriodIds([]);
     }, [period?.id]);
 
-    const comparativeOptions = periods.filter((item) => item.id !== period?.id);
+    const comparativeOptions = useMemo(
+      () => periods.filter(item => item.id !== period?.id),
+      [periods, period]
+    );
 
     async function generate() {
       if (!period) return;
