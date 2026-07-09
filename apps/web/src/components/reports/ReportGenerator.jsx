@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { api } from "../services/api";
+import { api } from "../../services/api";
 import Panel from "../common/Panel"
 import { Download, Wand2 } from 'lucide-react';
-import { downloadFile } from "../services/api.js";
+import { downloadFile } from "../../services/api.js";
 import AsyncButton from "../common/AsyncButton";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 

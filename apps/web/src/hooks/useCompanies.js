@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { getCompanies } from "../components/services/companyService";
+import { getCompanies } from "../services/companyService";
 
 export default function useCompanies() {
 

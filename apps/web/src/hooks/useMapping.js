@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
     getMapping,
     updateMapping
-} from "../components/services/mappingService";
+} from "../services/mappingService";
 
 const EMPTY_MAPPING = {
     mappings: [],

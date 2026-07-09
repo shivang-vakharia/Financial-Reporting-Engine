@@ -3,7 +3,7 @@ import Field from "../common/Field";
 import AsyncButton from "../common/AsyncButton";
 import AsyncDeleteButton from "../common/AsyncDeleteButton";
 import labelize from "../../utils/labelize";
-import { api } from "../services/api";
+import { api } from "../../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import Panel from "../common/Panel"
 

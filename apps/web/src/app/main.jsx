@@ -14,16 +14,16 @@ Loader2,
 CheckCircle2
 } from "lucide-react";
   
-import { downloadFile } from "../components/services/api.js";
+import { downloadFile } from "../services/api.js";
 
 import {
     deleteCompany as deleteCompanyApi,
-} from "../components/services/companyService.js";
+} from "../services/companyService.js";
 
 import {
     setAuthSession,
     clearAuthSession,
-} from "../components/services/authService.js";
+} from "../services/authService.js";
 import '../styles/styles.css';
 import LandingPage from "../components/auth/LandingPage.jsx";
 import Panel from "../components/common/Panel.jsx";
