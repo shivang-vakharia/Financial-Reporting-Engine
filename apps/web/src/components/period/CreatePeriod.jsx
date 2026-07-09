@@ -3,6 +3,7 @@ import { api } from "../../services/api";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import AsyncButton from "../common/AsyncButton";
 import { Plus } from "lucide-react";
+import { validatePeriod } from "../../validators/period.validator.js";
 
 export default function CreatePeriod({ company, onCreated }) {
     const [open, setOpen] = useState(false);
@@ -18,6 +19,12 @@ export default function CreatePeriod({ company, onCreated }) {
 
     async function submit(event) {
       event.preventDefault();
+
+      const errors = validatePeriod(form);
+      if (errors) {
+        alert(Object.values(errors).join("\n"));
+        return;
+      }
 
       try {
 

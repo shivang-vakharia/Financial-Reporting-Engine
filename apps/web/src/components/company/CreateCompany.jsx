@@ -3,6 +3,7 @@ import AsyncButton from "../common/AsyncButton";
 import useAsyncStatus from "../../hooks/useAsyncStatus";
 import { api } from "../../services/api";
 import { Plus } from "lucide-react";
+import { validateCompany } from "../../validators/company.validator.js";
 
 export default function CreateCompany({ onCreated }) {
     const [open, setOpen] = useState(false);
@@ -17,6 +18,12 @@ export default function CreateCompany({ onCreated }) {
 
     async function submit(event) {
       event.preventDefault();
+
+      const errors = validateCompany(form);
+      if (errors) {
+        alert(Object.values(errors).join("\n"));
+        return;
+      }
 
       try {
 
