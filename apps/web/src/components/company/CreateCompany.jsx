@@ -17,8 +17,9 @@ export default function CreateCompany({ onCreated }) {
 
     async function submit(event) {
       event.preventDefault();
-
+      try {
       await run(async () => {
+        
         const company = await api("/companies", {
           method: "POST",
           body: JSON.stringify(form),
@@ -34,7 +35,14 @@ export default function CreateCompany({ onCreated }) {
 
         onCreated(company);
       });
-    }
+      } catch (error) {
+          if (error.status === 409) {
+            alert(error.message);
+            return;
+          }
+          alert(error.message);
+        }
+      }
 
     return open ? (
       <form

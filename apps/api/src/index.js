@@ -132,6 +132,19 @@ app.get('/companies', requireAuth, async (req, res) => {
 app.post('/companies', requireAuth, async (req, res) => {
   const { name, cin, registeredOffice, reportingFramework = 'division_ii_ind_as' } = req.body;
   if (!name) return res.status(400).json({ error: 'Company name is required.' });
+  
+  const existingCompany =
+    await repository.findCompanyByCin(
+      req.user.id,
+      req.body.cin
+    );
+
+  if (existingCompany) {
+    return res.status(409).json({
+      error:
+        "A company with this CIN already exists."
+    });
+  }
   const company = {
     id: uuid(),
     ownerId: req.user.sub,

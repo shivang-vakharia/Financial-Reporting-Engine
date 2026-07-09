@@ -20,6 +20,23 @@ export function createPostgresRepository(pool) {
       const result = await pool.query('SELECT * FROM companies WHERE owner_id = $1 ORDER BY created_at DESC', [ownerId]);
       return result.rows.map(companyFromRow);
     },
+
+    async findCompanyByCin(ownerId, cin) {
+      const result = await pool.query(
+        `
+        SELECT *
+        FROM companies
+        WHERE owner_id = $1
+          AND LOWER(cin) = LOWER($2)
+        LIMIT 1
+        `,
+        [ownerId, cin]
+      );
+
+      return result.rows[0]
+        ? companyFromRow(result.rows[0])
+        : null;
+    },
     async createCompany(company) {
       const result = await pool.query(
         `INSERT INTO companies (id, owner_id, name, cin, registered_office, reporting_framework, metadata, created_at)
