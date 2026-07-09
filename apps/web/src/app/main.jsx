@@ -85,7 +85,7 @@ function App() {
 
   console.log("companyId state =", companyId);
 
-  uuseEffect(() => {
+  useEffect(() => {
     if (!session) return;
 
       initialize();
