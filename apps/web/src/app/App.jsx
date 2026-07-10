@@ -30,6 +30,22 @@ export default function App() {
   const [authMode, setAuthMode] = useState('login');
   const [message, setMessage] = useState("");
 
+  // Load persisted session if Remember Me was checked
+  useEffect(() => {
+    const stored = localStorage.getItem('authSession');
+    if (stored) {
+      try {
+        const payload = JSON.parse(stored);
+        setAuthSession(payload);
+        setSession(payload);
+      } catch (e) {
+        console.error('Failed to parse stored auth session', e);
+        localStorage.removeItem('authSession');
+      }
+    }
+  }, []);
+
+
   const {
     companies,
     companyId,
@@ -150,6 +166,7 @@ export default function App() {
 
   async function logout() {
     clearAuthSession();
+    localStorage.removeItem('authSession');
     setSession(null);
   }
 

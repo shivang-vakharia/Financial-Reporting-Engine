@@ -8,6 +8,7 @@ export default function AuthScreen({ mode: initialMode, onSession }) {
     const [mode, setMode] = useState(initialMode || 'login');
     const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
     const [error, setError] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
 
     useEffect(() => {
       setMode(initialMode || 'login');
@@ -44,6 +45,13 @@ export default function AuthScreen({ mode: initialMode, onSession }) {
           method: 'POST',
           body: JSON.stringify(form)
         });
+        if (mode === 'login') {
+          if (rememberMe) {
+            localStorage.setItem('authSession', JSON.stringify(payload));
+          } else {
+            localStorage.removeItem('authSession');
+          }
+        }
         onSession(payload);
       } catch (err) {
         setError(err.message);
@@ -58,6 +66,12 @@ export default function AuthScreen({ mode: initialMode, onSession }) {
         <Field label="Password" type="password" value={form.password} onChange={(password) => setForm({ ...form, password })} />
         {mode === 'signup' && <Field label="Confirm Password" type="password" value={form.confirmPassword} onChange={(confirmPassword) => setForm({ ...form, confirmPassword })} />}
         {error && <p className="error">{error}</p>}
+        {mode === 'login' && (
+          <div className="remember-me" style={{ marginBottom: '10px' }}>
+            <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
+            <label htmlFor="rememberMe" style={{ marginLeft: '4px' }}>Remember me</label>
+          </div>
+        )}
         <button className="primary">{mode === 'login' ? 'Sign In' : 'Create Account'}</button>
         <button type="button" className="link-button" onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}>
           {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
