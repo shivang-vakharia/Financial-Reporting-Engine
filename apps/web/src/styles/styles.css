@@ -987,3 +987,19 @@ button:disabled {
 button:disabled:hover {
     transform: none;
 }
+
+/* Remember Me and Selected Company styling */
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.selected-company {
+  background: var(--surface-lowest);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
