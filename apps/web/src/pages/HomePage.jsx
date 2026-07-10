@@ -52,21 +52,21 @@ export default function HomePage({
         </Panel>
         <Panel title="Selected Company">
           {selectedCompany ? (
-              <div className="selected-company">
-                <p><strong>{selectedCompany.name}</strong></p>
-                <p>{selectedCompany.cin}</p>
-                <p>{selectedCompany.registeredOffice}</p>
-                <button
-                  className="secondary"
-                  type="button"
-                  onClick={() => setCurrentView(VIEWS.WORKSPACE)}
-                >
-                  Go to workspace
-                </button>
-              </div>
-            ) : (
-              <p className="muted">Create or choose a company to begin reviewing trial balances and generating reports.</p>
-            )}
+            <>
+              <p><strong>{selectedCompany.name}</strong></p>
+              <p>{selectedCompany.cin}</p>
+              <p>{selectedCompany.registeredOffice}</p>
+              <button
+                className="secondary"
+                type="button"
+                onClick={() => setCurrentView(VIEWS.WORKSPACE)}
+              >
+                Go to workspace
+              </button>
+            </>
+          ) : (
+            <p className="muted">Create or choose a company to begin reviewing trial balances and generating reports.</p>
+          )}
         </Panel>
       </section>
     </div>

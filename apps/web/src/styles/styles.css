@@ -995,11 +995,4 @@ button:disabled:hover {
   gap: 6px;
   margin-bottom: 10px;
 }
-
-.selected-company {
-  background: var(--surface-lowest);
-  border: 1px solid var(--outline);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
+
