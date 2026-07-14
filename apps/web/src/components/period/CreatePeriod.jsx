@@ -52,13 +52,7 @@ export default function CreatePeriod({ company, onCreated }) {
 
       } catch (error) {
 
-          // Specific handling for duplicate period dates
-          if (error.status === 409) {
-            alert('A reporting period with these dates already exists for this company.');
-            return;
-          }
-
-          // Generic error fallback
+          // Show the error message from the server (including any duplicate info)
           alert(error.message);
       }
     }
