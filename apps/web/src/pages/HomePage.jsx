@@ -53,15 +53,15 @@ export default function HomePage({
         <Panel title="Selected Company">
           {selectedCompany ? (
             <>
-              <p><strong>{selectedCompany.name}</strong></p>
-              <p>{selectedCompany.cin}</p>
-              <p>{selectedCompany.registeredOffice}</p>
+              <p><strong>Name: {selectedCompany.name}</strong></p>
+              <p>CIN Number: {selectedCompany.cin}</p>
+              <p>Registered Office: {selectedCompany.registeredOffice}</p>
               <button
                 className="secondary"
                 type="button"
                 onClick={() => setCurrentView(VIEWS.WORKSPACE)}
               >
-                Go to workspace
+                Go to Workspace
               </button>
             </>
           ) : (
