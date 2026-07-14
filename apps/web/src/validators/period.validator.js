@@ -5,7 +5,7 @@ export function validatePeriod(period) {
   if (!period.label || !period.label.trim()) {
     errors.label = VALIDATION_ERRORS.PERIOD_LABEL_REQUIRED;
   }
-  
+
   if (period.startDate && period.endDate) {
     const start = new Date(period.startDate);
     const end = new Date(period.endDate);
