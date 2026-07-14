@@ -55,10 +55,12 @@ export default function WorkspacePage({
       </section>
       {message && <div className="notice">{message}</div>}
       <MappingTable
-        mapping={mapping}
-        scheduleLines={scheduleLines}
-        onMappingUpdated={updateMappingResult}
-      />
+          mapping={mapping}
+          scheduleLines={scheduleLines}
+          onMappingUpdated={(mappingId, scheduleLineId) =>
+            updateMappingResult(periodId, mappingId, scheduleLineId)
+          }
+        />
       <ReportGenerator
         company={selectedCompany}
         period={selectedPeriod}

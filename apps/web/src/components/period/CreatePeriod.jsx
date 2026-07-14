@@ -38,20 +38,28 @@ export default function CreatePeriod({ company, onCreated }) {
             }
           );
 
-          setOpen(false);
-
-          onCreated(period);
+           setOpen(false);
+           onCreated(period);
+           // Reset form fields after a successful period creation
+           setForm({
+             label: '',
+             periodType: 'quarterly',
+             startDate: '',
+             endDate: ''
+           });
 
         });
 
       } catch (error) {
 
-        if (error.status === 409) {
-          alert(error.message);
-          return;
-        }
+          // Specific handling for duplicate period dates
+          if (error.status === 409) {
+            alert('A reporting period with these dates already exists for this company.');
+            return;
+          }
 
-        alert(error.message);
+          // Generic error fallback
+          alert(error.message);
       }
     }
 
