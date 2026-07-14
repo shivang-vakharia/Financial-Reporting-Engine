@@ -54,15 +54,17 @@ export default function HomePage({
           {selectedCompany ? (
             <>
               <p><strong>Name: {selectedCompany.name}</strong></p>
-              <p>CIN Number: {selectedCompany.cin}</p>
-              <p>Registered Office: {selectedCompany.registeredOffice}</p>
-              <button
-                className="secondary"
-                type="button"
-                onClick={() => setCurrentView(VIEWS.WORKSPACE)}
-              >
-                Go to Workspace
-              </button>
+              <p><strong>CIN Number:</strong> {selectedCompany.cin}</p>
+              <p><strong>Registered Office:</strong> {selectedCompany.registeredOffice}</p>
+              <div className="actions" style={{ marginTop: '12px', justifyContent: 'flex-end' }}>
+                <button
+                  className="secondary"
+                  type="button"
+                  onClick={() => setCurrentView(VIEWS.WORKSPACE)}
+                >
+                  Go to Workspace
+                </button>
+              </div>
             </>
           ) : (
             <p className="muted">Create or choose a company to begin reviewing trial balances and generating reports.</p>
